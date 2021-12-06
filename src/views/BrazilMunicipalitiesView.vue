@@ -15,7 +15,7 @@ import { defineComponent } from 'vue';
 import InlineSvg from 'vue-inline-svg';
 
 export default defineComponent({
-  name: 'HomeView',
+  name: 'BrazilMunicipalitiesView',
 
   components: {
     InlineSvg
