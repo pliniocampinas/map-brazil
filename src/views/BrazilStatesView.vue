@@ -75,7 +75,6 @@ export default defineComponent({
       console.log('response', response)
 
       graphData.value = response.map(state => stateSchemaToGraph(state))
-      console.log('pib_per_capita_brl', graphData.value.map(state => state.gdpPerCapita))
       min_value.value = d3.min(graphData.value.map(state => state.gdpPerCapita)) || 0;
       max_value.value = d3.max(graphData.value.map(state => state.gdpPerCapita)) || 0;
     }
@@ -101,20 +100,33 @@ export default defineComponent({
       }
 
       const stateElements = [...document.querySelectorAll('.map__states .estado')].map(estado => {
+        const stateCode = getStateCode(estado.getAttribute('xlink:href') || '')
+        const stateData = graphData.value.find(state => state.stateCode === stateCode)
         return {
-          stateCode: getStateCode(estado.getAttribute('xlink:href') || ''),
+          gdpPerCapita: stateData?.gdpPerCapita || 0,
+          stateCode,
           href: estado.getAttribute('xlink:href') || '',
           element: estado
         }
       })
-      console.log('stateElements', stateElements)
-      stateElements.forEach(stateElement => {
-        console.log(stateElement.element);
-        // (stateElement.element as any).style.setProperty('fill', 'red')
-        if(stateElement.stateCode !== `SP`) {
+
+      stateElements.sort((state1, state2) => state1.gdpPerCapita - state2.gdpPerCapita)
+      const stateAmount = stateElements.length
+      stateElements.forEach((stateElement, index) => {
+        const minMaxDiff = max_value.value - min_value.value;
+
+        if(index < 5) {
+          (stateElement.element as any).querySelector(`path`).style.setProperty('fill', 'red')
           return
         }
-        (stateElement.element as any).querySelector(`path`).style.setProperty('fill', 'red')
+
+        if(index >= (stateAmount - 5)) {
+          (stateElement.element as any).querySelector(`path`).style.setProperty('fill', 'darkgreen')
+          return
+        }
+        
+        (stateElement.element as any).querySelector(`path`).style.setProperty('fill', 'lightgreen')
+        return
       })
     }
 
