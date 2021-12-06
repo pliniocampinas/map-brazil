@@ -1,29 +1,9 @@
 # map-brazil
 
-## Project setup
-```
-npm install
-```
+## States Source
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+https://www.gov.br/anm/pt-br/canais_atendimento/fale-conosco/mapa-do-brasil-svg
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## Municipalities Source
 
-### Run your unit tests
-```
-npm run test:unit
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+https://upload.wikimedia.org/wikipedia/commons/d/d1/Brazil_Municipalities.svg
