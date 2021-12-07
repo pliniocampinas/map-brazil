@@ -35,11 +35,6 @@ interface StateGraphData {
   stateCode: string
 }
 
-interface StatesDictinarySchema {
-  uf_nome_dash_case: string
-  uf_sigla: string
-}
-
 const stateSchemaToGraph = (stateCsv: StatesCsvSchema): StateGraphData => {
   return {
     gdpPerCapita: parseFloat(stateCsv.pib_per_capita_brl),
@@ -80,73 +75,47 @@ export default defineComponent({
     }
     
     const statesSvgLoaded = async (e: any) => {
-      console.log('statesSvgLoaded', e)
-      stateList.value = [...document.querySelectorAll('.map__states .estado')].map(estado => estado.getAttribute('xlink:href') || '');
-      console.log('stateList ', stateList.value);
+      const statePathElementSelector = '.map__states .estado path'
+
+      stateList.value = [...document.querySelectorAll(statePathElementSelector)]
+        .map(estado => estado.getAttribute('statecode') || '')
+        .filter(estado => estado?.length > 0);
 
       await fetchData();
-      
-      const statesDictinary = await fetch(document.location.origin + '/dic_ufs.csv')
-        .then(response => response.text())
-        .then(v => d3.csvParse(v)) as StatesDictinarySchema[]
 
-      console.log('statesDictinary', statesDictinary)
-
-      const getStateCode = (stateName: string) => {
-        const foundState = statesDictinary.find(state => {
-          return state.uf_nome_dash_case.replace(/[^a-zA-Z]+/g, '')===stateName.replace(/[^a-zA-Z]+/g, '')
+      const stateElements = [...document.querySelectorAll(statePathElementSelector)]
+        .map(estado => {
+          console.log('estado', estado)
+          const stateCode = estado.getAttribute('statecode') || ''
+          console.log('stateCode', stateCode)
+          const stateData = graphData.value.find(state => state.stateCode === stateCode)
+          return {
+            gdpPerCapita: stateData?.gdpPerCapita || 0,
+            stateCode: stateCode,
+            element: estado
+          }
         })
-        return foundState?.uf_sigla || ''
-      }
-
-      const stateElements = [...document.querySelectorAll('.map__states .estado')].map(estado => {
-        const stateCode = getStateCode(estado.getAttribute('xlink:href') || '')
-        const stateData = graphData.value.find(state => state.stateCode === stateCode)
-        return {
-          gdpPerCapita: stateData?.gdpPerCapita || 0,
-          stateCode,
-          href: estado.getAttribute('xlink:href') || '',
-          element: estado
-        }
-      })
+        .filter(estado => estado.stateCode?.length > 0);
 
       stateElements.sort((state1, state2) => state1.gdpPerCapita - state2.gdpPerCapita)
       const stateAmount = stateElements.length
       stateElements.forEach((stateElement, index) => {
-        const minMaxDiff = max_value.value - min_value.value;
-
         if(index < 5) {
-          (stateElement.element as any).querySelector(`path`).style.setProperty('fill', 'red')
+          (stateElement.element as any).style.setProperty('fill', 'red')
           return
         }
 
         if(index >= (stateAmount - 5)) {
-          (stateElement.element as any).querySelector(`path`).style.setProperty('fill', 'darkgreen')
+          (stateElement.element as any).style.setProperty('fill', 'darkgreen')
           return
         }
         
-        (stateElement.element as any).querySelector(`path`).style.setProperty('fill', 'lightgreen')
+        (stateElement.element as any).style.setProperty('fill', 'lightgreen')
         return
       })
     }
 
-    const x = d3
-      .scaleBand()
-      .domain(graphData.value.map(state => `${state.gdpPerCapita}`))
-      .range([0, width]);
-
-    const y = d3
-      .scaleLinear()
-      .domain([min_value.value, max_value.value])
-      .range([height, 0]);
-
-    // var colors = d3.scaleQuantize()
-    //   .domain([min_value.value, max_value.value])
-    //     "#FFFFBF", "#FEE08B", "#FDAE61", "#F46D43", "#D53E4F", "#9E0142"]);
-
     return {
-      // x,
-      // y,
       statesSvgLoaded,
       svgLoadError,
       stateList,
