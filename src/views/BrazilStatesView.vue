@@ -52,7 +52,6 @@ export default defineComponent({
   setup() {
     const stateList = ref([] as string[]);
     const width = 500;
-    const height = 500;
     const min_value = ref(0);
     const max_value = ref(0);
 
@@ -67,11 +66,7 @@ export default defineComponent({
         .then(response => response.text())
         .then(v => d3.csvParse(v)) as StatesCsvSchema[]
 
-      console.log('response', response)
-
       graphData.value = response.map(state => stateSchemaToGraph(state))
-      min_value.value = d3.min(graphData.value.map(state => state.gdpPerCapita)) || 0;
-      max_value.value = d3.max(graphData.value.map(state => state.gdpPerCapita)) || 0;
     }
     
     const statesSvgLoaded = async (e: any) => {
@@ -82,12 +77,12 @@ export default defineComponent({
         .filter(estado => estado?.length > 0);
 
       await fetchData();
+      min_value.value = d3.min(graphData.value.map(state => state.gdpPerCapita)) || 0;
+      max_value.value = d3.max(graphData.value.map(state => state.gdpPerCapita)) || 0;
 
       const stateElements = [...document.querySelectorAll(statePathElementSelector)]
         .map(estado => {
-          console.log('estado', estado)
           const stateCode = estado.getAttribute('statecode') || ''
-          console.log('stateCode', stateCode)
           const stateData = graphData.value.find(state => state.stateCode === stateCode)
           return {
             gdpPerCapita: stateData?.gdpPerCapita || 0,
@@ -98,20 +93,19 @@ export default defineComponent({
         .filter(estado => estado.stateCode?.length > 0);
 
       stateElements.sort((state1, state2) => state1.gdpPerCapita - state2.gdpPerCapita)
-      const stateAmount = stateElements.length
-      stateElements.forEach((stateElement, index) => {
-        if(index < 5) {
-          (stateElement.element as any).style.setProperty('fill', 'red')
-          return
-        }
 
-        if(index >= (stateAmount - 5)) {
-          (stateElement.element as any).style.setProperty('fill', 'darkgreen')
-          return
-        }
-        
-        (stateElement.element as any).style.setProperty('fill', 'lightgreen')
-        return
+      // Between [0, 1], 5 numbers for 5 tones.
+      const scaleOfColor = [0, 0.3, 0.6, 0.8, 1]
+
+      const interpolator = d3.interpolateRdYlGn;
+      const colors = scaleOfColor.map(x => interpolator(x));
+
+      const getColor = d3.scaleQuantize<string, number>()
+        .domain([0, max_value.value])
+        .range(colors);
+
+      stateElements.forEach(stateElement => {
+        (stateElement.element as any).style.setProperty('fill', getColor(stateElement.gdpPerCapita))
       })
     }
 
