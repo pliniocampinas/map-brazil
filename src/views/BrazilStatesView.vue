@@ -50,12 +50,10 @@ export default defineComponent({
   },
 
   setup() {
-    const stateList = ref([] as string[]);
-    const width = 500;
     const min_value = ref(0);
     const max_value = ref(0);
 
-    const graphData = ref([] as StateGraphData[]) 
+    let graphData = [] as StateGraphData[] 
 
     const svgLoadError = (e: any) => {
       console.log('svgLoadError', e)
@@ -66,24 +64,21 @@ export default defineComponent({
         .then(response => response.text())
         .then(v => d3.csvParse(v)) as StatesCsvSchema[]
 
-      graphData.value = response.map(state => stateSchemaToGraph(state))
+      graphData = response.map(state => stateSchemaToGraph(state))
     }
     
     const statesSvgLoaded = async (e: any) => {
       const statePathElementSelector = '.map__states .estado path'
 
-      stateList.value = [...document.querySelectorAll(statePathElementSelector)]
-        .map(estado => estado.getAttribute('statecode') || '')
-        .filter(estado => estado?.length > 0);
-
       await fetchData();
-      min_value.value = d3.min(graphData.value.map(state => state.gdpPerCapita)) || 0;
-      max_value.value = d3.max(graphData.value.map(state => state.gdpPerCapita)) || 0;
+      min_value.value = d3.min(graphData.map(state => state.gdpPerCapita)) || 0;
+      max_value.value = d3.max(graphData.map(state => state.gdpPerCapita)) || 0;
 
+      // Set array with data
       const stateElements = [...document.querySelectorAll(statePathElementSelector)]
         .map(estado => {
           const stateCode = estado.getAttribute('statecode') || ''
-          const stateData = graphData.value.find(state => state.stateCode === stateCode)
+          const stateData = graphData.find(state => state.stateCode === stateCode)
           return {
             gdpPerCapita: stateData?.gdpPerCapita || 0,
             stateCode: stateCode,
@@ -94,9 +89,10 @@ export default defineComponent({
 
       stateElements.sort((state1, state2) => state1.gdpPerCapita - state2.gdpPerCapita)
 
+      // Prepare interpolator and scale.
+
       // Between [0, 1], 5 numbers for 5 tones.
       const scaleOfColor = [0, 0.3, 0.6, 0.8, 1]
-
       const interpolator = d3.interpolateRdYlGn;
       const colors = scaleOfColor.map(x => interpolator(x));
 
@@ -104,6 +100,7 @@ export default defineComponent({
         .domain([0, max_value.value])
         .range(colors);
 
+      // Style: Set colors
       stateElements.forEach(stateElement => {
         (stateElement.element as any).style.setProperty('fill', getColor(stateElement.gdpPerCapita))
       })
@@ -112,11 +109,8 @@ export default defineComponent({
     return {
       statesSvgLoaded,
       svgLoadError,
-      stateList,
-      width,
       min_value,
       max_value,
-      graphData,
     }
   }
 });
