@@ -33,3 +33,17 @@ export default defineComponent({
   },
 });
 </script>
+
+<style>
+a:hover {
+  filter: brightness(1.2);
+}
+
+a:hover text {
+  filter: invert(1);
+}
+
+a:hover path.circle {
+  filter: invert(1);
+}
+</style>
