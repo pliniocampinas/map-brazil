@@ -6,7 +6,7 @@
       <h2>Max: {{ maxValue }}</h2>
     </div>
     <BrazilStatesMap
-      @loaded="statesSvgLoaded($event)"
+      @loaded="statesSvgLoaded"
     >
     </BrazilStatesMap>
   </div>
