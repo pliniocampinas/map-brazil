@@ -50,7 +50,7 @@ export default defineComponent({
     const features = geoData.features?? []
 
     // D3 expects geometry coordinates to be clockwise, 
-    // if not some paths might be rendered to large 
+    // otherwise some paths might be rendered too large 
     // turf rewind function handles this edge case
     features.forEach((feature: any) => {
       if(!feature.geometry) {
