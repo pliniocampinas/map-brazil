@@ -10,18 +10,17 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/maps/brazil-states',
     name: 'BrazilStates',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/BrazilStatesView.vue')
+    component: () => import(/* webpackChunkName: "states-view" */ '../views/BrazilStatesView.vue')
   },
   {
     path: '/maps/brazil-municipalities',
     name: 'BrazilMunicipalities',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/BrazilMunicipalitiesView.vue')
+    component: () => import(/* webpackChunkName: "municipalities-view" */ '../views/BrazilMunicipalitiesView.vue')
+  },
+  {
+    path: '/maps/brazil-geo-municipalities',
+    name: 'BrazilGeoJsonMunicipalities',
+    component: () => import(/* webpackChunkName: "geo-municipalities-view" */ '../views/BrazilGeoMunicipalitiesView.vue')
   }
 ]
 

@@ -9,9 +9,12 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@turf/turf": "^6.5.0",
     "@types/d3": "^7.1.0",
+    "@types/topojson-client": "^3.1.0",
     "core-js": "^3.8.3",
     "d3": "^7.2.0",
+    "topojson-client": "^3.1.0",
     "vue": "^3.2.13",
     "vue-inline-svg": "^3.1.0",
     "vue-router": "^4.0.3"
