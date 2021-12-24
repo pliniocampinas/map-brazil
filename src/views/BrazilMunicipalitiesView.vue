@@ -76,8 +76,12 @@ svg {
 }
 
 .municipality {
-  fill: red;
+  fill: #2ca25f;
   stroke: #232323;
   stroke-width: 0.3;
+}
+
+.municipality:hover {
+  opacity: 0.7;
 }
 </style>
