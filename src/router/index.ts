@@ -16,11 +16,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/maps/brazil-municipalities',
     name: 'BrazilMunicipalities',
     component: () => import(/* webpackChunkName: "municipalities-view" */ '../views/BrazilMunicipalitiesView.vue')
-  },
-  {
-    path: '/maps/brazil-geo-municipalities',
-    name: 'BrazilGeoJsonMunicipalities',
-    component: () => import(/* webpackChunkName: "geo-municipalities-view" */ '../views/BrazilGeoMunicipalitiesView.vue')
   }
 ]
 
