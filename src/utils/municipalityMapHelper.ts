@@ -5,7 +5,7 @@ import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 const parseBrlCurrency = (currency: string): number => {
   return parseFloat(
     currency
-      .replace(/./g, '')
+      .replace('.', '')
       .replace(',', '.')
   )
 }
@@ -28,4 +28,17 @@ export const fetchData = async () => {
     .then(v => d3.csvParse(v)) as MunicipalitiesCsvSchema[]
 
   return response.map(state => schemaToData(state))
+}
+
+export const getColorFunction = (maxValue: number) => {
+  // Between [0, 1], 5 numbers for 5 tones.
+  const scaleOfColor = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+  const interpolator = d3.interpolateRdYlGn
+  const colors = scaleOfColor.map(x => interpolator(x))
+
+  const getColor = d3.scaleQuantize<string, number>()
+    .domain([0, maxValue])
+    .range(colors)
+
+  return getColor
 }

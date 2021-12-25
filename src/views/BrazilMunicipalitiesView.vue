@@ -13,6 +13,7 @@
             :key="index"
             :description="feature.properties.description"
             :citycode="feature.properties.id"
+            :fill="getColor(feature.properties.gdpPerCapita)"
             @mouseover="handleMouseOver(feature.properties)"
             @mouseleave="handleMouseLeave(feature.properties)"
           >
@@ -21,10 +22,13 @@
       </svg>
     </div>
     <div class="map__municipalities__details">
+      <p>Max value: {{ maxValue }}</p>
+      <p>Min value: {{ minValue }}</p>
       <h4>Municipality</h4>
       <template v-if="hoveredCityName">
-        <p>{{ hoveredCityName }}</p>
-        <p>{{ hoveredCityGdp.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}</p>
+        <p>Name: {{ hoveredCityName }}</p>
+        <p>Gdp: {{ hoveredCityGdp.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}</p>
+        <p>Gdp Per Capita: {{ hoveredCityGdpPerCapita.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}</p>
       </template>
       <p v-else>
         None selected
@@ -34,13 +38,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onBeforeMount } from 'vue';
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
-import { geoPath, geoEqualEarth, min, max } from 'd3';
+import { geoPath, geoEqualEarth, min, max, ScaleQuantize, map } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
-import { fetchData } from '@/utils/municipalityMapHelper';
+import { fetchData, getColorFunction } from '@/utils/municipalityMapHelper';
 
 interface MunicipalitiesFeatureProperties {
   id: string
@@ -48,6 +52,7 @@ interface MunicipalitiesFeatureProperties {
   description: string
   gdp?: number
   state?: string
+  gdpPerCapita?: number
 }
 
 export default defineComponent({
@@ -63,6 +68,8 @@ export default defineComponent({
     const maxValue = ref(0);
     const hoveredCityName = ref("")
     const hoveredCityGdp = ref(0)
+    const hoveredCityGdpPerCapita = ref(0)
+    const getColor = ref(((n: number) => 'black') as ScaleQuantize<string, number>)
 
     const topology = (municipalitiesTopoJson as unknown) as Topology
 
@@ -87,7 +94,7 @@ export default defineComponent({
       feature.geometry = rewind(feature.geometry, {reverse:true})
     })
 
-    onMounted(async () => {
+    onBeforeMount(async () => {
       // Add new properties from gdp municipalities list
       const gdpList = await fetchData()
       features.forEach((feature) => {
@@ -102,29 +109,37 @@ export default defineComponent({
         }
         // Mutate object
         feature.properties.gdp = gdpData.gdpThousandsBrl
+        feature.properties.gdpPerCapita = gdpData.gdpPerCapitaBrl
         feature.properties.state = gdpData.state
       })
 
-      minValue.value = min(gdpList.map(city => city.gdpThousandsBrl)) || 0;
-      maxValue.value = max(gdpList.map(city => city.gdpThousandsBrl)) || 0;
+      minValue.value = min(gdpList.map(city => city.gdpPerCapitaBrl)) || 0;
+      maxValue.value = max(gdpList.filter(city => city.gdpPerCapitaBrl < 120000).map(city => city.gdpPerCapitaBrl)) || 0;
+      getColor.value = getColorFunction(maxValue.value)
     })
 
     const handleMouseOver = (props: MunicipalitiesFeatureProperties) => {
       hoveredCityName.value = props.name
       hoveredCityGdp.value = props.gdp?? 0
+      hoveredCityGdpPerCapita.value = props.gdpPerCapita?? 0
     }
     const handleMouseLeave = (props: MunicipalitiesFeatureProperties) => {
       hoveredCityName.value = ""
       hoveredCityGdp.value = 0
+      hoveredCityGdpPerCapita.value = 0
     }
 
     return {
       width,
       height,
+      minValue,
+      maxValue,
       hoveredCityName,
       hoveredCityGdp,
+      hoveredCityGdpPerCapita,
       features,
       path: geoPath(projection),
+      getColor,
       handleMouseOver,
       handleMouseLeave,
     }
@@ -149,9 +164,8 @@ svg {
 }
 
 .map__municipality {
-  fill: #2ca25f;
   stroke: #232323;
-  stroke-width: 0.3;
+  stroke-width: 0.1;
 }
 
 .map__municipality:hover {
