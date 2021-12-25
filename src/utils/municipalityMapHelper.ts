@@ -2,11 +2,19 @@ import * as d3 from "d3";
 import MunicipalitiesCsvSchema from '@/interfaces/MunicipalitiesCsvSchema';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 
+const parseBrlCurrency = (currency: string): number => {
+  return parseFloat(
+    currency
+      .replace(/./g, '')
+      .replace(',', '.')
+  )
+}
+
 const schemaToData = (municipalitiesCsvRow: MunicipalitiesCsvSchema): MunicipalitiesData => {
   return {
     year: parseInt(municipalitiesCsvRow.ano),
     gdpThousandsBrl: parseFloat(municipalitiesCsvRow.pib_bruto_1000),
-    gdpPerCapitaBrl: parseFloat(municipalitiesCsvRow.pib_per_capita_1),
+    gdpPerCapitaBrl: parseBrlCurrency(municipalitiesCsvRow.pib_per_capita_1),
     state: municipalitiesCsvRow.sigla_uf,
     code: municipalitiesCsvRow.codigo_municipio,
     name: municipalitiesCsvRow.nome_municipio
