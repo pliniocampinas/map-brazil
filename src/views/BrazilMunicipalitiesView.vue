@@ -1,8 +1,8 @@
 <template>
   <div class="map__municipalities">
-    <p class="map__municipalities__title">
+    <h2 class="map__municipalities__title">
       Municipalities
-    </p>
+    </h2>
     <div class="map__municipalities__container">
        <svg :width="width" :height="height">
         <g>
@@ -21,24 +21,33 @@
       </svg>
     </div>
     <div class="map__municipalities__details">
-      <p>Municipality name</p>
-      <p>{{hoveredCityName || 'None selected'}}</p>
+      <h4>Municipality</h4>
+      <template v-if="hoveredCityName">
+        <p>{{ hoveredCityName }}</p>
+        <p>{{ hoveredCityGdp.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}</p>
+      </template>
+      <p v-else>
+        None selected
+      </p>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
-import { geoPath, geoEqualEarth } from 'd3';
+import { geoPath, geoEqualEarth, min, max } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
+import { fetchData } from '@/utils/municipalityMapHelper';
 
 interface MunicipalitiesFeatureProperties {
   id: string
   name: string
   description: string
+  gdp?: number
+  state?: string
 }
 
 export default defineComponent({
@@ -50,8 +59,10 @@ export default defineComponent({
   setup() {
     const width = 500
     const height = 550
-
+    const minValue = ref(0);
+    const maxValue = ref(0);
     const hoveredCityName = ref("")
+    const hoveredCityGdp = ref(0)
 
     const topology = (municipalitiesTopoJson as unknown) as Topology
 
@@ -76,17 +87,42 @@ export default defineComponent({
       feature.geometry = rewind(feature.geometry, {reverse:true})
     })
 
+    onMounted(async () => {
+      // Add new properties from gdp municipalities list
+      const gdpList = await fetchData()
+      features.forEach((feature) => {
+        if(!feature.properties) {
+          console.warn('This feature has no properties data')
+          return
+        }
+        const gdpData = gdpList.find(d => d.code === feature.properties?.id)
+        if(!gdpData) {
+          console.warn('Municipality GDP data not found', feature.properties)
+          return
+        }
+        // Mutate object
+        feature.properties.gdp = gdpData.gdpThousandsBrl
+        feature.properties.state = gdpData.state
+      })
+
+      minValue.value = min(gdpList.map(city => city.gdpThousandsBrl)) || 0;
+      maxValue.value = max(gdpList.map(city => city.gdpThousandsBrl)) || 0;
+    })
+
     const handleMouseOver = (props: MunicipalitiesFeatureProperties) => {
       hoveredCityName.value = props.name
+      hoveredCityGdp.value = props.gdp?? 0
     }
     const handleMouseLeave = (props: MunicipalitiesFeatureProperties) => {
       hoveredCityName.value = ""
+      hoveredCityGdp.value = 0
     }
 
     return {
       width,
       height,
       hoveredCityName,
+      hoveredCityGdp,
       features,
       path: geoPath(projection),
       handleMouseOver,
@@ -120,5 +156,7 @@ svg {
 
 .map__municipality:hover {
   opacity: 0.7;
+  stroke-width: 1.5;
+  stroke: #cccccc;
 }
 </style>
