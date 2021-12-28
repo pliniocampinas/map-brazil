@@ -11,10 +11,9 @@
             :description="feature.properties.description"
             :citycode="feature.properties.id"
             :fill="getColor(feature.properties.gdpPerCapita)"
-            @mouseover="handleMouseOver(feature.properties)"
-            @mouseleave="handleMouseLeave()"
-            @click="handleClick(feature.properties)"
+            @click="(event) => handleClick(feature.properties, event)"
           >
+            <title>{{ feature.properties.name }}</title>
           </path>
         </g>
       </svg>
@@ -23,10 +22,10 @@
       <p>Max value: {{ formatCurrencyBrl(maxValue) }}</p>
       <p>Min value: {{ formatCurrencyBrl(minValue) }}</p>
       <h4>Municipality</h4>
-      <template v-if="hoverTip.cityName">
-        <p>Name: {{ hoverTip.cityName }}</p>
-        <p>Gdp: {{ formatCurrencyBrl(hoverTip.cityGdp) }}</p>
-        <p>Gdp Per Capita: {{ formatCurrencyBrl(hoverTip.cityGdpPerCapita) }}</p>
+      <template v-if="selectedCity.cityName">
+        <p>Name: {{ selectedCity.cityName }}</p>
+        <p>Gdp: {{ formatCurrencyBrl(selectedCity.cityGdp) }}</p>
+        <p>Gdp Per Capita: {{ formatCurrencyBrl(selectedCity.cityGdpPerCapita) }}</p>
       </template>
       <p v-else>
         None selected
@@ -36,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onBeforeMount } from 'vue';
+import { defineComponent, onBeforeMount, ref, reactive, watch } from 'vue';
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
@@ -66,7 +65,8 @@ export default defineComponent({
     const minValue = ref(0);
     const maxValue = ref(0);
     const getColor = ref(((n: number) => '#c3c3c3') as ScaleQuantize<string, number>)
-    const hoverTip = reactive({
+    const selectedCity = reactive({
+      cityCode: "",
       cityName: "",
       cityGdp: 0,
       cityGdpPerCapita: 0,
@@ -118,34 +118,39 @@ export default defineComponent({
       getColor.value = getColorFunction(maxValue.value)
     })
 
-    const handleMouseOver = (props: MunicipalitiesFeatureProperties) => {
-      hoverTip.cityName = props.name
-      hoverTip.cityGdp = props.gdp?? 0
-      hoverTip.cityGdpPerCapita = props.gdpPerCapita?? 0
+    const handleClick = (props: MunicipalitiesFeatureProperties, event: any) => {
+      selectedCity.cityCode = props.id
+      selectedCity.cityName = props.name
+      selectedCity.cityGdp = props.gdp?? 0
+      selectedCity.cityGdpPerCapita = props.gdpPerCapita?? 0
     }
 
-    const handleMouseLeave = () => {
-      hoverTip.cityName = ""
-      hoverTip.cityGdp = 0
-      hoverTip.cityGdpPerCapita = 0
+    const getPathElement = (code: string) => {
+      return document.querySelector(`path[citycode="${code}"]`)
     }
-
-    const handleClick = (props: MunicipalitiesFeatureProperties) => {
-      console.log('handleClick')
-    }
+    
+    watch(
+      () => selectedCity.cityCode,
+      (code, prevCode) => {
+        if(prevCode) {
+          const previouslySelectedPathElement = getPathElement(prevCode)
+          previouslySelectedPathElement?.classList.remove('map__municipality--selected')
+        }
+        const selectedPathElement = getPathElement(code)
+        selectedPathElement?.classList.add('map__municipality--selected')
+      }
+    )
 
     return {
       width,
       height,
       minValue,
       maxValue,
-      hoverTip,
+      selectedCity,
       features,
       path: geoPath(projection),
       getColor,
       formatCurrencyBrl,
-      handleMouseOver,
-      handleMouseLeave,
       handleClick,
     }
   }
@@ -168,11 +173,13 @@ export default defineComponent({
 .map__municipality {
   stroke: #232323;
   stroke-width: 0;
+  cursor: pointer;
 }
 
-.map__municipality:hover {
+.map__municipality:hover,
+.map__municipality--selected {
   opacity: 0.7;
-  stroke-width: 1.5;
+  stroke-width: 3;
   stroke: #cccccc;
 }
 </style>
