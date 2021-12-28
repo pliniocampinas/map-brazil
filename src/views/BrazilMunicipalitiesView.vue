@@ -1,8 +1,5 @@
 <template>
   <div class="map__municipalities">
-    <h2 class="map__municipalities__title">
-      Municipalities
-    </h2>
     <div class="map__municipalities__container">
        <svg :width="width" :height="height">
         <g>
@@ -22,13 +19,13 @@
       </svg>
     </div>
     <div class="map__municipalities__details">
-      <p>Max value: {{ maxValue }}</p>
-      <p>Min value: {{ minValue }}</p>
+      <p>Max value: {{ formatCurrencyBrl(maxValue) }}</p>
+      <p>Min value: {{ formatCurrencyBrl(minValue) }}</p>
       <h4>Municipality</h4>
       <template v-if="hoveredCityName">
         <p>Name: {{ hoveredCityName }}</p>
-        <p>Gdp: {{ hoveredCityGdp.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}</p>
-        <p>Gdp Per Capita: {{ hoveredCityGdpPerCapita.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}</p>
+        <p>Gdp: {{ formatCurrencyBrl(hoveredCityGdp) }}</p>
+        <p>Gdp Per Capita: {{ formatCurrencyBrl(hoveredCityGdpPerCapita) }}</p>
       </template>
       <p v-else>
         None selected
@@ -45,6 +42,7 @@ import { GeometryObject, Topology } from 'topojson-specification';
 import { geoPath, geoEqualEarth, min, max, ScaleQuantize, map } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
 import { fetchData, getColorFunction } from '@/utils/municipalityMapHelper';
+import { formatCurrencyBrl } from '@/utils/formatters';
 
 interface MunicipalitiesFeatureProperties {
   id: string
@@ -69,7 +67,7 @@ export default defineComponent({
     const hoveredCityName = ref("")
     const hoveredCityGdp = ref(0)
     const hoveredCityGdpPerCapita = ref(0)
-    const getColor = ref(((n: number) => 'black') as ScaleQuantize<string, number>)
+    const getColor = ref(((n: number) => '#c3c3c3') as ScaleQuantize<string, number>)
 
     const topology = (municipalitiesTopoJson as unknown) as Topology
 
@@ -140,6 +138,7 @@ export default defineComponent({
       features,
       path: geoPath(projection),
       getColor,
+      formatCurrencyBrl,
       handleMouseOver,
       handleMouseLeave,
     }
@@ -153,19 +152,16 @@ export default defineComponent({
   grid-template-columns: 1fr 200px;
   max-width: 750px;
   margin: auto;
+  padding: 24px 12px;
 }
 
-.map__municipalities__title {
-  grid-column: span 2;
-}
-
-svg {
+.map__municipalities__container {
   border: 1px solid black;
 }
 
 .map__municipality {
   stroke: #232323;
-  stroke-width: 0.1;
+  stroke-width: 0;
 }
 
 .map__municipality:hover {

@@ -2,8 +2,8 @@
   <div class="map__states">
     <div class="computed__browser">
       <h1>Pib per capita(R$)</h1>
-      <h2>Min: {{ minValue }}</h2>
-      <h2>Max: {{ maxValue }}</h2>
+      <h2>Min: {{ formatCurrencyBrl(minValue) }}</h2>
+      <h2>Max: {{ formatCurrencyBrl(maxValue) }}</h2>
     </div>
     <BrazilStatesMap
       @loaded="statesSvgLoaded"
@@ -15,6 +15,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { fetchData, styleMap } from '@/utils/stateMapHelper';
+import { formatCurrencyBrl } from '@/utils/formatters';
 import BrazilStatesMap from '@/components/BrazilStatesMap.vue';
 import * as d3 from "d3";
 
@@ -38,6 +39,7 @@ export default defineComponent({
 
     return {
       statesSvgLoaded,
+      formatCurrencyBrl,
       minValue,
       maxValue,
     }
