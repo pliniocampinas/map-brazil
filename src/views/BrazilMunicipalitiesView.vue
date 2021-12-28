@@ -1,7 +1,10 @@
 <template>
   <div class="map__municipalities">
     <div class="map__municipalities__container">
-       <svg :width="width" :height="height">
+      <div class="map__loading" v-if="isLoading">
+        <LoadingBars/>
+      </div>
+      <svg :width="width" :height="height">
         <g>
           <path
             v-for="(feature, index) in features"
@@ -43,6 +46,7 @@ import { geoPath, geoEqualEarth, min, max, ScaleQuantize, map } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
 import { fetchData, getColorFunction } from '@/utils/municipalityMapHelper';
 import { formatCurrencyBrl } from '@/utils/formatters';
+import LoadingBars from '@/components/LoadingBars.vue';
 
 interface MunicipalitiesFeatureProperties {
   id: string
@@ -57,13 +61,15 @@ export default defineComponent({
   name: 'BrazilMunicipalitiesView',
 
   components: {
+    LoadingBars,
   },
 
   setup() {
     const width = 500
     const height = 550
-    const minValue = ref(0);
-    const maxValue = ref(0);
+    const minValue = ref(0)
+    const maxValue = ref(0)
+    const isLoading = ref(false)
     const getColor = ref(((n: number) => '#c3c3c3') as ScaleQuantize<string, number>)
     const selectedCity = reactive({
       cityCode: "",
@@ -96,7 +102,9 @@ export default defineComponent({
 
     onBeforeMount(async () => {
       // Add new properties from gdp municipalities list
+      isLoading.value = true
       const gdpList = await fetchData()
+      isLoading.value = false
       features.forEach((feature) => {
         if(!feature.properties) {
           console.warn('This feature has no properties data')
@@ -142,6 +150,7 @@ export default defineComponent({
     )
 
     return {
+      isLoading,
       width,
       height,
       minValue,
@@ -164,10 +173,19 @@ export default defineComponent({
   max-width: 750px;
   margin: auto;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  position: relative;
 }
 
 .map__municipalities__container {
   background-color: #f9f9f9;
+}
+
+.map__loading {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(200, 200, 200, 0.6);
+  display: flex;
 }
 
 .map__municipality {
