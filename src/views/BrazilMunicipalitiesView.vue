@@ -12,7 +12,8 @@
             :citycode="feature.properties.id"
             :fill="getColor(feature.properties.gdpPerCapita)"
             @mouseover="handleMouseOver(feature.properties)"
-            @mouseleave="handleMouseLeave(feature.properties)"
+            @mouseleave="handleMouseLeave()"
+            @click="handleClick(feature.properties)"
           >
           </path>
         </g>
@@ -22,10 +23,10 @@
       <p>Max value: {{ formatCurrencyBrl(maxValue) }}</p>
       <p>Min value: {{ formatCurrencyBrl(minValue) }}</p>
       <h4>Municipality</h4>
-      <template v-if="hoveredCityName">
-        <p>Name: {{ hoveredCityName }}</p>
-        <p>Gdp: {{ formatCurrencyBrl(hoveredCityGdp) }}</p>
-        <p>Gdp Per Capita: {{ formatCurrencyBrl(hoveredCityGdpPerCapita) }}</p>
+      <template v-if="hoverTip.cityName">
+        <p>Name: {{ hoverTip.cityName }}</p>
+        <p>Gdp: {{ formatCurrencyBrl(hoverTip.cityGdp) }}</p>
+        <p>Gdp Per Capita: {{ formatCurrencyBrl(hoverTip.cityGdpPerCapita) }}</p>
       </template>
       <p v-else>
         None selected
@@ -35,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onBeforeMount } from 'vue';
+import { defineComponent, ref, reactive, onBeforeMount } from 'vue';
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
@@ -64,13 +65,14 @@ export default defineComponent({
     const height = 550
     const minValue = ref(0);
     const maxValue = ref(0);
-    const hoveredCityName = ref("")
-    const hoveredCityGdp = ref(0)
-    const hoveredCityGdpPerCapita = ref(0)
     const getColor = ref(((n: number) => '#c3c3c3') as ScaleQuantize<string, number>)
+    const hoverTip = reactive({
+      cityName: "",
+      cityGdp: 0,
+      cityGdpPerCapita: 0,
+    })
 
     const topology = (municipalitiesTopoJson as unknown) as Topology
-
     const geometries = municipalitiesTopoJson.objects['geojs-100-mun'] as GeometryObject
     const geoData = feature(topology, geometries) as FeatureCollection
 
@@ -117,14 +119,19 @@ export default defineComponent({
     })
 
     const handleMouseOver = (props: MunicipalitiesFeatureProperties) => {
-      hoveredCityName.value = props.name
-      hoveredCityGdp.value = props.gdp?? 0
-      hoveredCityGdpPerCapita.value = props.gdpPerCapita?? 0
+      hoverTip.cityName = props.name
+      hoverTip.cityGdp = props.gdp?? 0
+      hoverTip.cityGdpPerCapita = props.gdpPerCapita?? 0
     }
-    const handleMouseLeave = (props: MunicipalitiesFeatureProperties) => {
-      hoveredCityName.value = ""
-      hoveredCityGdp.value = 0
-      hoveredCityGdpPerCapita.value = 0
+
+    const handleMouseLeave = () => {
+      hoverTip.cityName = ""
+      hoverTip.cityGdp = 0
+      hoverTip.cityGdpPerCapita = 0
+    }
+
+    const handleClick = (props: MunicipalitiesFeatureProperties) => {
+      console.log('handleClick')
     }
 
     return {
@@ -132,15 +139,14 @@ export default defineComponent({
       height,
       minValue,
       maxValue,
-      hoveredCityName,
-      hoveredCityGdp,
-      hoveredCityGdpPerCapita,
+      hoverTip,
       features,
       path: geoPath(projection),
       getColor,
       formatCurrencyBrl,
       handleMouseOver,
       handleMouseLeave,
+      handleClick,
     }
   }
 });
