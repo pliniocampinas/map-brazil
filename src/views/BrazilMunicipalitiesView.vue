@@ -19,13 +19,13 @@
       </svg>
     </div>
     <div class="map__municipalities__details">
-      <p>Max value: {{ formatCurrencyBrl(maxValue) }}</p>
-      <p>Min value: {{ formatCurrencyBrl(minValue) }}</p>
+      <p><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
+      <p><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
       <h4>Municipality</h4>
       <template v-if="selectedCity.cityName">
-        <p>Name: {{ selectedCity.cityName }}</p>
-        <p>Gdp: {{ formatCurrencyBrl(selectedCity.cityGdp) }}</p>
-        <p>Gdp Per Capita: {{ formatCurrencyBrl(selectedCity.cityGdpPerCapita) }}</p>
+        <p><strong>Name:</strong> {{ selectedCity.cityName }}</p>
+        <p><strong>Gdp:</strong> {{ formatCurrencyBrl(selectedCity.cityGdp) }}</p>
+        <p><strong>Gdp Per Capita:</strong> {{ formatCurrencyBrl(selectedCity.cityGdpPerCapita) }}</p>
       </template>
       <p v-else>
         None selected
@@ -163,11 +163,11 @@ export default defineComponent({
   grid-template-columns: 1fr 200px;
   max-width: 750px;
   margin: auto;
-  padding: 24px 12px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 
 .map__municipalities__container {
-  border: 1px solid black;
+  background-color: #f9f9f9;
 }
 
 .map__municipality {
@@ -181,5 +181,15 @@ export default defineComponent({
   opacity: 0.7;
   stroke-width: 3;
   stroke: #cccccc;
+}
+
+.map__municipalities__details {
+  padding: 24px;
+  text-align: left;
+  background-color: #e3e3e3;
+}
+
+.map__municipalities__details p {
+  font-size: 12px;
 }
 </style>
