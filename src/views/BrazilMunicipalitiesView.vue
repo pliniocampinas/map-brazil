@@ -22,6 +22,20 @@
       </svg>
     </div>
     <div class="map__municipalities__details">
+      <label for="select-visualizations">Visualization:</label>
+      <select
+        name="visualizations"
+        id="select-visualizations"
+        @change="handleVisualizationChange"
+      >
+        <option
+          v-for="opt in visualizationOptions"
+          :value="opt.value"
+          :key="opt.value"
+        >
+          {{opt.label}}
+        </option>
+      </select>
       <p><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
       <p><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
       <h4>Municipality</h4>
@@ -67,6 +81,16 @@ export default defineComponent({
   setup() {
     const width = 500
     const height = 550
+    const visualizationOptions = [
+      {
+        label: 'Gdp per Capita',
+        value: 'gdp-per-capita'
+      },
+      {
+        label: 'Total Gdp',
+        value: 'total-gdp'
+      }
+    ]
     const minValue = ref(0)
     const maxValue = ref(0)
     const isLoading = ref(false)
@@ -126,11 +150,15 @@ export default defineComponent({
       getColor.value = getColorFunction(maxValue.value)
     })
 
-    const handleClick = (props: MunicipalitiesFeatureProperties, event: any) => {
+    const handleClick = (props: MunicipalitiesFeatureProperties) => {
       selectedCity.cityCode = props.id
       selectedCity.cityName = props.name
       selectedCity.cityGdp = props.gdp?? 0
       selectedCity.cityGdpPerCapita = props.gdpPerCapita?? 0
+    }
+
+    const handleVisualizationChange = ({ target }: { target: HTMLInputElement }) => {
+      console.log('handleVisualizationChange', target.value)
     }
 
     const getPathElement = (code: string) => {
@@ -150,9 +178,10 @@ export default defineComponent({
     )
 
     return {
-      isLoading,
       width,
       height,
+      visualizationOptions,
+      isLoading,
       minValue,
       maxValue,
       selectedCity,
@@ -161,6 +190,7 @@ export default defineComponent({
       getColor,
       formatCurrencyBrl,
       handleClick,
+      handleVisualizationChange,
     }
   }
 });
