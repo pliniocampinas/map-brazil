@@ -186,6 +186,8 @@ export default defineComponent({
   height: 100%;
   background-color: rgba(200, 200, 200, 0.6);
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .map__municipality {
