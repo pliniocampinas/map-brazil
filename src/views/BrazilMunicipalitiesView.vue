@@ -112,12 +112,12 @@ export default defineComponent({
       .scale(700)
       .translate([800, 80])
 
-    const features = geoData.features?? []
+    const features = ref(geoData.features?? [])
 
     // D3 expects geometry coordinates to be clockwise, 
     // otherwise some paths might be rendered too large 
     // turf rewind function handles this edge case
-    features.forEach((feature) => {
+    features.value.forEach((feature) => {
       if(!feature.geometry) {
         return
       }
@@ -130,7 +130,8 @@ export default defineComponent({
       isLoading.value = true
       const gdpList = await fetchData()
       isLoading.value = false
-      features.forEach((feature) => {
+
+      features.value.forEach((feature) => {
         if(!feature.properties) {
           console.warn('This feature has no properties data')
           return
@@ -167,8 +168,8 @@ export default defineComponent({
     }
     
     const pathProperties = computed(() => {
-      return features.map(feature => {
-        if(selectedVisualization.value === 'gdp-per-capita') {
+      return features.value.map(feature => {
+        if(selectedVisualization.value === 'gdp-per-capita' || selectedVisualization.value === '') {
           return {
             ...feature,
             visualizationAttribute: feature.properties?.gdpPerCapita
