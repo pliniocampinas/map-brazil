@@ -7,14 +7,14 @@
       <svg :width="width" :height="height">
         <g>
           <path
-            v-for="(feature, index) in features"
+            v-for="(feature, index) in pathProperties"
             class="map__municipality"
             :d="path(feature)"
             :key="index"
             :description="feature.properties.description"
             :citycode="feature.properties.id"
-            :fill="getColor(feature.properties.gdpPerCapita)"
-            @click="(event) => handleClick(feature.properties, event)"
+            :fill="getColor(feature.visualizationAttribute)"
+            @click="handleClick(feature.properties)"
           >
             <title>{{ feature.properties.name }}</title>
           </path>
@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref, reactive, watch } from 'vue';
+import { computed, defineComponent, onBeforeMount, ref, reactive, watch } from 'vue';
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
@@ -91,6 +91,7 @@ export default defineComponent({
         value: 'total-gdp'
       }
     ]
+    const selectedVisualization = ref('gdp-per-capita')
     const minValue = ref(0)
     const maxValue = ref(0)
     const isLoading = ref(false)
@@ -158,12 +159,29 @@ export default defineComponent({
     }
 
     const handleVisualizationChange = ({ target }: { target: HTMLInputElement }) => {
-      console.log('handleVisualizationChange', target.value)
+      selectedVisualization.value = target.value
     }
 
     const getPathElement = (code: string) => {
       return document.querySelector(`path[citycode="${code}"]`)
     }
+    
+    const pathProperties = computed(() => {
+      return features.map(feature => {
+        if(selectedVisualization.value === 'gdp-per-capita') {
+          return {
+            ...feature,
+            visualizationAttribute: feature.properties?.gdpPerCapita
+          }
+        }
+        if(selectedVisualization.value === 'total-gdp') {
+          return {
+            ...feature,
+            visualizationAttribute: feature.properties?.gdp
+          }
+        }
+      })
+    })
     
     watch(
       () => selectedCity.cityCode,
@@ -185,7 +203,7 @@ export default defineComponent({
       minValue,
       maxValue,
       selectedCity,
-      features,
+      pathProperties,
       path: geoPath(projection),
       getColor,
       formatCurrencyBrl,
