@@ -80,7 +80,7 @@ export default defineComponent({
         value: 'gdp-per-capita'
       },
       {
-        label: 'Total Gdp',
+        label: 'Total Gdp(1000 BRL)',
         value: 'total-gdp'
       }
     ]
