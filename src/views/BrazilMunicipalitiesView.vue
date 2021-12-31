@@ -56,7 +56,7 @@ import { computed, defineComponent, onBeforeMount, ref, reactive, watch } from '
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
-import { geoPath, geoEqualEarth, min, max, ScaleQuantize, map } from 'd3';
+import { geoPath, geoEqualEarth, min, max, ScaleQuantile, map } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
 import { fetchData, getColorFunction } from '@/utils/municipalityMapHelper';
 import { formatCurrencyBrl } from '@/utils/formatters';
@@ -95,7 +95,7 @@ export default defineComponent({
     const minValue = ref(0)
     const maxValue = ref(0)
     const isLoading = ref(false)
-    const getColor = ref(((n: number) => '#c3c3c3') as ScaleQuantize<string, number>)
+    const getColor = ref(((n: number) => '#c3c3c3') as ScaleQuantile<string, number>)
     const selectedCity = reactive({
       cityCode: "",
       cityName: "",
@@ -148,8 +148,8 @@ export default defineComponent({
       })
 
       minValue.value = min(gdpList.map(city => city.gdpPerCapitaBrl)) || 0;
-      maxValue.value = max(gdpList.filter(city => city.gdpPerCapitaBrl < 120000).map(city => city.gdpPerCapitaBrl)) || 0;
-      getColor.value = getColorFunction(maxValue.value)
+      maxValue.value = max(gdpList.map(city => city.gdpPerCapitaBrl)) || 0;
+      getColor.value = getColorFunction(gdpList.map(city => city.gdpPerCapitaBrl))
     })
 
     const handleClick = (props: MunicipalitiesFeatureProperties) => {
