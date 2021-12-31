@@ -7,16 +7,16 @@
       <svg :width="width" :height="height">
         <g>
           <path
-            v-for="(feature, index) in pathProperties"
+            v-for="(visualizationData, index) in visualizationDataList"
             class="map__municipality"
-            :d="path(feature)"
+            :d="path(visualizationData.feature)"
             :key="index"
-            :description="feature.properties.description"
-            :citycode="feature.properties.id"
-            :fill="getColor(feature.visualizationAttribute)"
-            @click="handleClick(feature.properties)"
+            :description="visualizationData.name"
+            :citycode="visualizationData.code"
+            :fill="visualizationData.color"
+            @click="handleClick(visualizationData)"
           >
-            <title>{{ feature.properties.name }}</title>
+            <title>{{ visualizationData.name }}</title>
           </path>
         </g>
       </svg>
@@ -60,16 +60,9 @@ import { geoPath, geoEqualEarth, min, max, ScaleQuantile, map } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
 import { fetchData, getColorFunction } from '@/utils/municipalityMapHelper';
 import { formatCurrencyBrl } from '@/utils/formatters';
+import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import LoadingBars from '@/components/LoadingBars.vue';
 
-interface MunicipalitiesFeatureProperties {
-  id: string
-  name: string
-  description: string
-  gdp?: number
-  state?: string
-  gdpPerCapita?: number
-}
 
 export default defineComponent({
   name: 'BrazilMunicipalitiesView',
@@ -95,7 +88,6 @@ export default defineComponent({
     const minValue = ref(0)
     const maxValue = ref(0)
     const isLoading = ref(false)
-    const getColor = ref(((n: number) => '#c3c3c3') as ScaleQuantile<string, number>)
     const selectedCity = reactive({
       cityCode: "",
       cityName: "",
@@ -112,12 +104,13 @@ export default defineComponent({
       .scale(700)
       .translate([800, 80])
 
-    const features = ref(geoData.features?? [])
+    const features = geoData.features?? []
+    const municipalitiesList = ref<MunicipalitiesData[]>([])
 
     // D3 expects geometry coordinates to be clockwise, 
     // otherwise some paths might be rendered too large 
     // turf rewind function handles this edge case
-    features.value.forEach((feature) => {
+    features.forEach((feature) => {
       if(!feature.geometry) {
         return
       }
@@ -128,35 +121,24 @@ export default defineComponent({
     onBeforeMount(async () => {
       // Add new properties from gdp municipalities list
       isLoading.value = true
-      const gdpList = await fetchData()
+      const data = await fetchData()
       isLoading.value = false
-
-      features.value.forEach((feature) => {
-        if(!feature.properties) {
-          console.warn('This feature has no properties data')
-          return
+      municipalitiesList.value = data.map(municipality => {
+        const municipalityFeature = features.find(feature => municipality.code === feature.properties?.id)
+        return {
+          ...municipality,
+          feature: municipalityFeature
         }
-        const gdpData = gdpList.find(d => d.code === feature.properties?.id)
-        if(!gdpData) {
-          console.warn('Municipality GDP data not found', feature.properties)
-          return
-        }
-        // Mutate object
-        feature.properties.gdp = gdpData.gdpThousandsBrl
-        feature.properties.gdpPerCapita = gdpData.gdpPerCapitaBrl
-        feature.properties.state = gdpData.state
       })
 
-      minValue.value = min(gdpList.map(city => city.gdpPerCapitaBrl)) || 0;
-      maxValue.value = max(gdpList.map(city => city.gdpPerCapitaBrl)) || 0;
-      getColor.value = getColorFunction(gdpList.map(city => city.gdpPerCapitaBrl))
+      computeDetails()
     })
 
-    const handleClick = (props: MunicipalitiesFeatureProperties) => {
-      selectedCity.cityCode = props.id
-      selectedCity.cityName = props.name
-      selectedCity.cityGdp = props.gdp?? 0
-      selectedCity.cityGdpPerCapita = props.gdpPerCapita?? 0
+    const handleClick = (municipality: MunicipalitiesData) => {
+      selectedCity.cityCode = municipality.code
+      selectedCity.cityName = municipality.name
+      selectedCity.cityGdp = municipality.gdpThousandsBrl?? 0
+      selectedCity.cityGdpPerCapita = municipality.gdpPerCapitaBrl?? 0
     }
 
     const handleVisualizationChange = ({ target }: { target: HTMLInputElement }) => {
@@ -166,20 +148,31 @@ export default defineComponent({
     const getPathElement = (code: string) => {
       return document.querySelector(`path[citycode="${code}"]`)
     }
+
+    const computeDetails = () => {
+      const mainValues = municipalitiesList.value.map(municipality => getMainAttribute(municipality))
+      minValue.value = min(mainValues) || 0;
+      maxValue.value = max(mainValues) || 0;
+    }
+
+    const getMainAttribute = (municipality: MunicipalitiesData) => {
+      if(selectedVisualization.value === 'gdp-per-capita' || selectedVisualization.value === '') {
+        return municipality.gdpPerCapitaBrl
+      }
+      if(selectedVisualization.value === 'total-gdp') {
+        return municipality.gdpThousandsBrl
+      }
+      return 0
+    }
     
-    const pathProperties = computed(() => {
-      return features.value.map(feature => {
-        if(selectedVisualization.value === 'gdp-per-capita' || selectedVisualization.value === '') {
-          return {
-            ...feature,
-            visualizationAttribute: feature.properties?.gdpPerCapita
-          }
-        }
-        if(selectedVisualization.value === 'total-gdp') {
-          return {
-            ...feature,
-            visualizationAttribute: feature.properties?.gdp
-          }
+    const visualizationDataList = computed(() => {
+      const mainValues = municipalitiesList.value.map(municipality => getMainAttribute(municipality))
+      const getColor = getColorFunction(mainValues)
+      return municipalitiesList.value.map(municipality => {
+        return {
+          ...municipality,
+          visualizationAttribute: getMainAttribute(municipality),
+          color: getColor(getMainAttribute(municipality))
         }
       })
     })
@@ -196,6 +189,10 @@ export default defineComponent({
       }
     )
 
+    watch(selectedVisualization, () => {
+      computeDetails()
+    })
+
     return {
       width,
       height,
@@ -204,9 +201,8 @@ export default defineComponent({
       minValue,
       maxValue,
       selectedCity,
-      pathProperties,
+      visualizationDataList,
       path: geoPath(projection),
-      getColor,
       formatCurrencyBrl,
       handleClick,
       handleVisualizationChange,
