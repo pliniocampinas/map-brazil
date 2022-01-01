@@ -24,6 +24,7 @@
     <div class="map__municipalities__details">
       <label for="select-visualizations">Year: {{selectedYear}}</label>
       <input type="range" min="2010" max="2019" v-model.number="selectedYear">
+      <button @click="playMap" :disabled="isPlaying">Play</button>
       <label for="select-visualizations">Visualization:</label>
       <select
         name="visualizations"
@@ -74,6 +75,8 @@ export default defineComponent({
   },
 
   setup() {
+    const sleep = async (ms: number) => await new Promise(resolve => setTimeout(resolve, ms));
+
     const width = 500
     const height = 550
     const visualizationOptions = [
@@ -91,6 +94,7 @@ export default defineComponent({
     const minValue = ref(0)
     const maxValue = ref(0)
     const isLoading = ref(false)
+    const isPlaying = ref(false)
     const selectedCity = reactive({
       cityCode: "",
       cityName: "",
@@ -186,6 +190,16 @@ export default defineComponent({
         }
       })
     })
+
+    const playMap = async () => {
+      isPlaying.value = true
+      selectedYear.value = 2010
+      while(selectedYear.value !== 2019) {
+        await sleep(1000)
+        selectedYear.value++
+      }
+      isPlaying.value = false
+    }
     
     watch(
       () => selectedCity.cityCode,
@@ -208,6 +222,7 @@ export default defineComponent({
       height,
       visualizationOptions,
       isLoading,
+      isPlaying,
       minValue,
       maxValue,
       selectedCity,
@@ -217,6 +232,7 @@ export default defineComponent({
       formatCurrencyBrl,
       handleClick,
       handleVisualizationChange,
+      playMap,
     }
   }
 });
