@@ -22,6 +22,8 @@
       </svg>
     </div>
     <div class="map__municipalities__details">
+      <label for="select-visualizations">Year: {{selectedYear}}</label>
+      <input type="range" min="2010" max="2019" v-model.number="selectedYear">
       <label for="select-visualizations">Visualization:</label>
       <select
         name="visualizations"
@@ -85,6 +87,7 @@ export default defineComponent({
       }
     ]
     const selectedVisualization = ref('gdp-per-capita')
+    const selectedYear = ref(2019)
     const minValue = ref(0)
     const maxValue = ref(0)
     const isLoading = ref(false)
@@ -119,11 +122,14 @@ export default defineComponent({
     })
 
     onBeforeMount(async () => {
-      // Add new properties from gdp municipalities list
+      await loadData()
+    })
+
+    const loadData = async () => {
       isLoading.value = true
       const data = await fetchData()
       isLoading.value = false
-      municipalitiesList.value = data.filter(d => d.year === 2019).map(municipality => {
+      municipalitiesList.value = data.map(municipality => {
         const municipalityFeature = features.find(feature => municipality.code === feature.properties?.id)
         return {
           ...municipality,
@@ -132,7 +138,7 @@ export default defineComponent({
       })
 
       computeDetails()
-    })
+    }
 
     const handleClick = (municipality: MunicipalitiesData) => {
       selectedCity.cityCode = municipality.code
@@ -166,9 +172,13 @@ export default defineComponent({
     }
     
     const visualizationDataList = computed(() => {
-      const mainValues = municipalitiesList.value.map(municipality => getMainAttribute(municipality))
+      const mainValues = municipalitiesList.value
+        .filter(d => d.year === selectedYear.value)
+        .map(municipality => getMainAttribute(municipality))
       const getColor = getColorFunction(mainValues)
-      return municipalitiesList.value.map(municipality => {
+      return municipalitiesList.value
+        .filter(d => d.year === selectedYear.value)
+        .map(municipality => {
         return {
           ...municipality,
           visualizationAttribute: getMainAttribute(municipality),
@@ -201,6 +211,7 @@ export default defineComponent({
       minValue,
       maxValue,
       selectedCity,
+      selectedYear,
       visualizationDataList,
       path: geoPath(projection),
       formatCurrencyBrl,
