@@ -13,8 +13,8 @@ const parseBrlCurrency = (currency: string): number => {
 const schemaToData = (municipalitiesCsvRow: MunicipalitiesCsvSchema): MunicipalitiesData => {
   return {
     year: parseInt(municipalitiesCsvRow.ano),
-    gdpThousandsBrl: parseFloat(municipalitiesCsvRow.pib_bruto_1000),
-    gdpPerCapitaBrl: parseBrlCurrency(municipalitiesCsvRow.pib_per_capita_1),
+    gdpThousandsBrl: parseFloat(municipalitiesCsvRow.pib_bruto_1000brl),
+    gdpPerCapitaBrl: parseBrlCurrency(municipalitiesCsvRow.pib_per_capita_1brl),
     state: municipalitiesCsvRow.sigla_uf,
     code: municipalitiesCsvRow.codigo_municipio,
     name: municipalitiesCsvRow.nome_municipio
@@ -22,7 +22,7 @@ const schemaToData = (municipalitiesCsvRow: MunicipalitiesCsvSchema): Municipali
 }
 
 export const fetchData = async () => {
-  const csvUrl = 'https://gist.githubusercontent.com/pliniocampinas/26a7afa913d4eeae1aad89d998718fd3/raw/22e235ce89032614cb3a17ccd9fbe970d704579a/pib-municipios-2019.csv'
+  const csvUrl = 'https://gist.githubusercontent.com/pliniocampinas/3a0b327dbe7180dd984352e1be4b86e9/raw/4c89ca9aa4d46fbb4630e892613492e8593879b0/pib-municipios-2010-2019.csv'
   const response = await fetch(csvUrl)
     .then(response => response.text())
     .then(v => d3.csvParse(v)) as MunicipalitiesCsvSchema[]

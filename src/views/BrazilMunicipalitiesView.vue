@@ -123,7 +123,7 @@ export default defineComponent({
       isLoading.value = true
       const data = await fetchData()
       isLoading.value = false
-      municipalitiesList.value = data.map(municipality => {
+      municipalitiesList.value = data.filter(d => d.year === 2019).map(municipality => {
         const municipalityFeature = features.find(feature => municipality.code === feature.properties?.id)
         return {
           ...municipality,
