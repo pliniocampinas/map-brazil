@@ -160,7 +160,9 @@ export default defineComponent({
     }
 
     const computeDetails = () => {
-      const mainValues = municipalitiesList.value.map(municipality => getMainAttribute(municipality))
+      const mainValues = municipalitiesList.value
+        .filter(d => d.year === selectedYear.value)
+        .map(municipality => getMainAttribute(municipality))
       minValue.value = min(mainValues) || 0;
       maxValue.value = max(mainValues) || 0;
     }
@@ -214,6 +216,10 @@ export default defineComponent({
     )
 
     watch(selectedVisualization, () => {
+      computeDetails()
+    })
+
+    watch(selectedYear, () => {
       computeDetails()
     })
 
