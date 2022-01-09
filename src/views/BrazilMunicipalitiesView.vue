@@ -179,8 +179,8 @@ export default defineComponent({
     
     const visualizationDataList = computed(() => {
       const mainValues = municipalitiesList.value
-        .filter(d => d.year === selectedYear.value)
         .map(municipality => getMainAttribute(municipality))
+        .map(value => value > 0? value: 0)
       const getColor = getColorFunction(mainValues)
       return municipalitiesList.value
         .filter(d => d.year === selectedYear.value)
