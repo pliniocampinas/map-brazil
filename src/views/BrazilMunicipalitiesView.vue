@@ -197,7 +197,7 @@ export default defineComponent({
       isPlaying.value = true
       selectedYear.value = 2010
       while(selectedYear.value !== 2019) {
-        await sleep(1000)
+        await sleep(700)
         selectedYear.value++
       }
       isPlaying.value = false
