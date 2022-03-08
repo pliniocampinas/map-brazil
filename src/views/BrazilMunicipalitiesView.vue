@@ -25,6 +25,7 @@
       <label for="select-visualizations">Year: {{selectedYear}}</label>
       <input type="range" min="2010" max="2019" v-model.number="selectedYear">
       <button @click="playMap" :disabled="isPlaying">Play</button>
+      <hr>
       <label for="select-visualizations">Visualization:</label>
       <select
         name="visualizations"
