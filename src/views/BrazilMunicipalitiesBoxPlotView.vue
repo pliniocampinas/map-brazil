@@ -4,8 +4,8 @@
       <div class="boxplot__loading" v-if="isLoading">
         <LoadingBars/>
       </div>
-    </div>
-    <div class="boxplot__municipalities__chart" ref="chartContainerElement">
+      <div class="boxplot__municipalities__chart" ref="chartContainerElement">
+      </div>
     </div>
   </div>
 </template>
@@ -36,7 +36,7 @@ export default defineComponent({
         yLabel: "Gdp Per Capita ($)",
         xLabel: "Year",
         width: 500,
-        height: 500,
+        height: 700,
       })
 
       chartContainerElement.value?.appendChild(chart as Node)
