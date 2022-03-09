@@ -1,7 +1,7 @@
 <template>
   <div class="boxplot__municipalities">
     <div class="boxplot__municipalities__container">
-      <div class="map__loading" v-if="isLoading">
+      <div class="boxplot__loading" v-if="isLoading">
         <LoadingBars/>
       </div>
     </div>
@@ -11,10 +11,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { fetchData } from '@/utils/municipalityMapHelper';
 import { BoxPlot } from '@/utils/boxPlotHelper';
-import { formatCurrencyBrl } from '@/utils/formatters';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import LoadingBars from '@/components/LoadingBars.vue';
 
@@ -26,20 +25,18 @@ export default defineComponent({
   },
 
   setup() {
-    const sleep = async (ms: number) => await new Promise(resolve => setTimeout(resolve, ms));
-
     const chartContainerElement = ref(null as HTMLElement | null)
     const isLoading = ref(false)
     const municipalitiesList = ref<MunicipalitiesData[]>([])
     
     const drawBoxPlot = () => {
       const chart = BoxPlot(municipalitiesList.value, {
-        // x: (d: MunicipalitiesData) => d.state,
-        y: (d: MunicipalitiesData) => d.gdpPerCapitaBrl,
-        xLabel: "Carats →",
-        yLabel: "↑ Price ($)",
+        x: (d: MunicipalitiesData) => d.year,
+        y: (d: MunicipalitiesData) => Math.round(d.gdpPerCapitaBrl / 100) * 100,
+        yLabel: "Gdp Per Capita ($)",
+        xLabel: "Year",
         width: 500,
-        height: 500
+        height: 500,
       })
 
       chartContainerElement.value?.appendChild(chart as Node)
@@ -56,12 +53,9 @@ export default defineComponent({
       })
     }
 
-    onBeforeMount(async () => {
-      await loadData()
-    })
-
     onMounted(async () => {
-      await drawBoxPlot()
+      await loadData()
+      drawBoxPlot()
     })
 
     return {
@@ -76,7 +70,7 @@ export default defineComponent({
 <style>
 .boxplot__municipalities {
   display: grid;
-  grid-template-columns: 1fr 200px;
+  grid-template-columns: 1fr;
   max-width: 750px;
   margin: auto;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
@@ -87,7 +81,7 @@ export default defineComponent({
   background-color: #f9f9f9;
 }
 
-.map__loading {
+.boxplot__loading {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -97,14 +91,14 @@ export default defineComponent({
   justify-content: center;
 }
 
-.map__municipality {
+.boxplot__municipality {
   stroke: #232323;
   stroke-width: 0;
   cursor: pointer;
 }
 
-.map__municipality:hover,
-.map__municipality--selected {
+.boxplot__municipality:hover,
+.boxplot__municipality--selected {
   opacity: 0.7;
   stroke-width: 3;
   stroke: #cccccc;

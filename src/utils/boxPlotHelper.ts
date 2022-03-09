@@ -1,4 +1,17 @@
-import * as d3 from "d3";
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+import {
+  map,
+  range,
+  bin,
+  min,
+  max,
+  quantile,
+  axisBottom,
+  axisLeft,
+  interpolateRound,
+  scaleLinear,
+  create
+} from "d3";
 
 interface BoxPlotOptions {
   x?: (x: any) => number, // given d in data, returns the (quantitative) x-value
@@ -35,17 +48,17 @@ export function BoxPlot(data: any[], {
   y = ([, y]) => y, // given d in data, returns the (quantitative) y-value
   width = 640, // outer width, in pixels
   height = 400, // outer height, in pixels
-  marginTop = 20, // top margin, in pixels
+  marginTop = 40, // top margin, in pixels
   marginRight = 30, // right margin, in pixels
   marginBottom = 30, // bottom margin, in pixels
   marginLeft = 40, // left margin, in pixels
   inset = 0.5, // left and right inset
   insetLeft = inset, // inset for left edge of box, in pixels
   insetRight = inset, // inset for right edge of box, in pixels
-  xType = d3.scaleLinear, // type of x-scale
+  xType = scaleLinear, // type of x-scale
   xDomain, // [xmin, xmax]
   xRange = [marginLeft, width - marginRight], // [left, right]
-  yType = d3.scaleLinear, // type of y-scale
+  yType = scaleLinear, // type of y-scale
   yDomain, // [ymin, ymax]
   yRange = [height - marginBottom, marginTop], // [bottom, top]
   thresholds = width / 40, // approximative number of thresholds
@@ -58,27 +71,26 @@ export function BoxPlot(data: any[], {
   yLabel = "" // a label for the y-axis
 }: BoxPlotOptions = {}) {
   // Compute values.
-  const X = d3.map(data, x);
-  const Y = d3.map(data, y);
+  const X = map(data, x);
+  const Y = map(data, y);
 
   // Filter undefined values.
-  const I = d3.range(X.length).filter(i => !isNaN(X[i]) && !isNaN(Y[i]));
+  const I = range(X.length).filter((i: any)  => !isNaN(X[i]) && !isNaN(Y[i]));
 
   // Compute the bins.
-  const B = d3.bin()
+  const B = bin()
       .thresholds(thresholds)
-      .value((i: any) => X[i])
-    (I)
+      .value((i: any) => X[i])(I)
     .map((bin: any) => {
       const y = (i: number) => Y[i];
-      const min = d3.min(bin, y) || 0;
-      const max = d3.max(bin, y) || 0;
-      const q1 = d3.quantile(bin, 0.25, y) || 0;
-      const q2 = d3.quantile(bin, 0.50, y) || 0;
-      const q3 = d3.quantile(bin, 0.75, y) || 0;
+      const minValue = min(bin, y) || 0;
+      const maxValue = max(bin, y) || 0;
+      const q1 = quantile(bin, 0.25, y) || 0;
+      const q2 = quantile(bin, 0.50, y) || 0;
+      const q3 = quantile(bin, 0.75, y) || 0;
       const iqr = q3 - q1; // interquartile range
-      const r0 = Math.max(min, q1 - iqr * 1.5);
-      const r1 = Math.min(max, q3 + iqr * 1.5);
+      const r0 = Math.max(minValue, q1 - iqr * 1.5);
+      const r1 = Math.min(maxValue, q3 + iqr * 1.5);
       bin.quartiles = [q1, q2, q3];
       bin.range = [r0, r1];
       bin.outliers = bin.filter((i: number) => Y[i] < r0 || Y[i] > r1);
@@ -86,16 +98,16 @@ export function BoxPlot(data: any[], {
     });
 
   // Compute default domains.
-  if (xDomain === undefined) xDomain = [d3.min(B, d => d.x0), d3.max(B, d => d.x1)];
-  if (yDomain === undefined) yDomain = [d3.min(B, d => d.range[0]), d3.max(B, d => d.range[1])];
+  if (xDomain === undefined) xDomain = [min(B, (d: any) => d.x0), max(B, (d: any) => d.x1)];
+  if (yDomain === undefined) yDomain = [min(B, (d: any) => d.range[0]), max(B, (d: any) => d.range[1])];
 
   // Construct scales and axes.
-  const xScale = xType(xDomain, xRange).interpolate(d3.interpolateRound);
+  const xScale = xType(xDomain, xRange).interpolate(interpolateRound);
   const yScale = yType(yDomain, yRange);
-  const xAxis = d3.axisBottom(xScale).ticks(thresholds, xFormat).tickSizeOuter(0);
-  const yAxis = d3.axisLeft(yScale).ticks(height / 40, yFormat);
+  const xAxis = axisBottom(xScale).ticks(thresholds, xFormat).tickSizeOuter(0);
+  const yAxis = axisLeft(yScale).ticks(height / 40, yFormat);
 
-  const svg = d3.create("svg")
+  const svg = create("svg")
       .attr("width", width)
       .attr("height", height)
       .attr("viewBox", [0, 0, width, height])
@@ -104,11 +116,11 @@ export function BoxPlot(data: any[], {
   svg.append("g")
       .attr("transform", `translate(${marginLeft},0)`)
       .call(yAxis)
-      .call(g => g.select(".domain").remove())
-      .call(g => g.selectAll(".tick line").clone()
+      .call((g: any) => g.select(".domain").remove())
+      .call((g: any) => g.selectAll(".tick line").clone()
           .attr("x2", width - marginLeft - marginRight)
           .attr("stroke-opacity", 0.1))
-      .call(g => g.append("text")
+      .call((g: any) => g.append("text")
           .attr("x", -marginLeft)
           .attr("y", 10)
           .attr("fill", "currentColor")
@@ -122,14 +134,14 @@ export function BoxPlot(data: any[], {
 
   g.append("path")
       .attr("stroke", stroke)
-      .attr("d", d => `
+      .attr("d", (d: any) => `
         M${xScale((d.x0 + d.x1) / 2)},${yScale(d.range[1])}
         V${yScale(d.range[0])}
       `);
 
   g.append("path")
       .attr("fill", fill)
-      .attr("d", d => `
+      .attr("d", (d: any) => `
         M${xScale(d.x0) + insetLeft},${yScale(d.quartiles[2])}
         H${xScale(d.x1) - insetRight}
         V${yScale(d.quartiles[0])}
@@ -140,7 +152,7 @@ export function BoxPlot(data: any[], {
   g.append("path")
       .attr("stroke", stroke)
       .attr("stroke-width", 2)
-      .attr("d", d => `
+      .attr("d", (d: any) => `
         M${xScale(d.x0) + insetLeft},${yScale(d.quartiles[1])}
         H${xScale(d.x1) - insetRight}
       `);
@@ -149,9 +161,9 @@ export function BoxPlot(data: any[], {
       .attr("fill", stroke)
       .attr("fill-opacity", 0.2)
       .attr("stroke", "none")
-      .attr("transform", d => `translate(${xScale((d.x0 + d.x1) / 2)},0)`)
+      .attr("transform", (d: any) => `translate(${xScale((d.x0 + d.x1) / 2)},0)`)
     .selectAll("circle")
-    .data(d => d.outliers)
+    .data((d: any) => d.outliers)
     .join("circle")
       .attr("r", 2)
       .attr("cx", () => (Math.random() - 0.5) * jitter)
@@ -160,7 +172,7 @@ export function BoxPlot(data: any[], {
   svg.append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
       .call(xAxis)
-      .call(g => g.append("text")
+      .call((g: any) => g.append("text")
           .attr("x", width)
           .attr("y", marginBottom - 4)
           .attr("fill", "currentColor")
