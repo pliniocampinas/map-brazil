@@ -1,11 +1,43 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/maps/brazil-states">States</router-link> |
-    <router-link to="/maps/brazil-municipalities">Municipalities</router-link>
+    <template v-for="(navLink, index) in navLinks" :key="index">
+      <router-link 
+        :to="navLink.to"
+      >
+        {{ navLink.text }}
+      </router-link>
+      {{isLastLink(index)? null: ' | '}}
+    </template>
   </nav>
   <router-view/>
 </template>
+
+<script setup lang="ts">
+
+const navLinks = [
+  {
+    text: 'Home',
+    to: '/',
+  },
+  {
+    text: 'States Map',
+    to: '/maps/brazil-states',
+  },
+  {
+    text: 'Municipalities Map',
+    to: '/maps/brazil-municipalities',
+  },
+  {
+    text: 'Municipalities BoxPlot',
+    to: '/plots/brazil-municipalities-boxplot',
+  },
+]
+
+// functions
+function isLastLink(index: number) {
+  return (navLinks.length - 1) === index
+}
+</script>
 
 <style>
 #app {
