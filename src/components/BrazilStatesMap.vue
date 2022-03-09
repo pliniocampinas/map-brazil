@@ -23,7 +23,7 @@ export default defineComponent({
   },
 
   setup() {
-    const svgLoadError = (e: any) => {
+    const svgLoadError = (e: Error) => {
       console.warn('svgLoadError', e)
     }
 

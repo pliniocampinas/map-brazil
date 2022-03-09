@@ -30,7 +30,7 @@ export default defineComponent({
     const minValue = ref(0);
     const maxValue = ref(0);
     
-    const statesSvgLoaded = async (e: any) => {
+    const statesSvgLoaded = async () => {
       const graphData = await fetchData();
       minValue.value = d3.min(graphData.map(state => state.gdpPerCapita)) || 0;
       maxValue.value = d3.max(graphData.map(state => state.gdpPerCapita)) || 0;

@@ -50,6 +50,6 @@ export const styleMap = (graphData: StateGraphData[], {maxValue}: StyleParams) =
 
   // Style: Set colors
   stateElements.forEach(stateElement => {
-    (stateElement.element as any).style.setProperty('fill', getColor(stateElement.gdpPerCapita))
+    (stateElement.element as SVGElement).style.setProperty('fill', getColor(stateElement.gdpPerCapita) as string)
   })
 }

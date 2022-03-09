@@ -60,7 +60,7 @@ import { computed, defineComponent, onBeforeMount, ref, reactive, watch } from '
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
-import { geoPath, geoEqualEarth, min, max, ScaleQuantile, map } from 'd3';
+import { geoPath, geoEqualEarth, min, max } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
 import { fetchData, getColorFunction } from '@/utils/municipalityMapHelper';
 import { formatCurrencyBrl } from '@/utils/formatters';
