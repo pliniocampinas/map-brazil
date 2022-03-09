@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/plots/brazil-municipalities-boxplot',
-    name: 'BrazilMunicipalities',
+    name: 'BrazilMunicipalitiesBoxplot',
     component: () => import(/* webpackChunkName: "boxplot-municipalities-view" */ '../views/BrazilMunicipalitiesBoxPlotView.vue')
   },
 ]
