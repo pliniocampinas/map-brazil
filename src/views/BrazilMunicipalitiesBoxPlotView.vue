@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import { fetchData } from '@/utils/municipalityMapHelper';
+import { fetchData } from '@/repositories/MunicipalityRepository';
 import { BoxPlot } from '@/utils/boxPlotHelper';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import LoadingBars from '@/components/LoadingBars.vue';

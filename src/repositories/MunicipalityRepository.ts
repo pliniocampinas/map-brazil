@@ -29,16 +29,3 @@ export const fetchData = async () => {
 
   return response.map(state => schemaToData(state))
 }
-
-export const getColorFunction = (dataset: number[]) => {
-  // Between [0, 1], 5 numbers for 5 tones.
-  const scaleOfColor = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-  const interpolator = d3.interpolateRdYlGn
-  const colors = scaleOfColor.map(x => interpolator(x))
-
-  const getColor = d3.scaleQuantile<string, number>()
-    .domain(dataset)
-    .range(colors)
-
-  return getColor
-}

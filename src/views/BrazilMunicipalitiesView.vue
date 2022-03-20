@@ -62,11 +62,24 @@ import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
 import { geoPath, geoEqualEarth, min, max } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
-import { fetchData, getColorFunction } from '@/utils/municipalityMapHelper';
+import { fetchData } from '@/repositories/MunicipalityRepository';
 import { formatCurrencyBrl } from '@/utils/formatters';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import LoadingBars from '@/components/LoadingBars.vue';
 
+import * as d3 from "d3";
+const getColorFunction = (dataset: number[]) => {
+  // Between [0, 1], 5 numbers for 5 tones.
+  const scaleOfColor = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+  const interpolator = d3.interpolateRdYlGn
+  const colors = scaleOfColor.map(x => interpolator(x))
+
+  const getColor = d3.scaleQuantile<string, number>()
+    .domain(dataset)
+    .range(colors)
+
+  return getColor
+}
 
 export default defineComponent({
   name: 'BrazilMunicipalitiesView',
