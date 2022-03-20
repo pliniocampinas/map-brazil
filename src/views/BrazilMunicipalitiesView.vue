@@ -64,6 +64,7 @@ import { geoPath, geoEqualEarth, min, max } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
 import { fetchData } from '@/repositories/MunicipalityRepository';
 import { formatCurrencyBrl } from '@/utils/formatters';
+import { sleep } from '@/utils/timeHelper';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import LoadingBars from '@/components/LoadingBars.vue';
 
@@ -89,8 +90,6 @@ export default defineComponent({
   },
 
   setup() {
-    const sleep = async (ms: number) => await new Promise(resolve => setTimeout(resolve, ms));
-
     const width = 500
     const height = 550
     const visualizationOptions = [
