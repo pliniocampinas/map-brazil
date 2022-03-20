@@ -1,0 +1,92 @@
+<template>
+  <div class="map__browser__container">
+    <div class="map__browser__loading" v-if="isLoading">
+      <LoadingBars/>
+    </div>
+    
+    <div class="map__browser__svg-container">
+      <slot name="map-svg"></slot>
+    </div>
+
+    <div class="map__browser__options">
+      <slot name="browser-options"></slot>
+    </div>
+
+    <div class="map__browser__details">
+      <slot name="browser-details"></slot>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, watch } from 'vue';
+import LoadingBars from '@/components/LoadingBars.vue';
+import { sleep } from '@/utils/timeHelper';
+import svgPanZoom from 'svg-pan-zoom'
+
+export default defineComponent({
+  name: 'MapBrowser',
+
+  components: {
+    LoadingBars,
+  },
+
+  props: {
+    isLoading: {
+      type: Boolean,
+      default: false
+    },
+  },
+
+  setup(props) {
+
+    const setPanZoom = () => {
+      sleep(500).then(() => {
+        svgPanZoom('.map__browser__svg-container svg');
+      })
+    }
+
+    watch(() => props.isLoading, setPanZoom)
+
+    return {
+      setPanZoom,
+    }
+  },
+});
+</script>
+
+<style>
+.map__browser__container {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 750px;
+  margin: auto;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  position: relative;
+}
+
+.map__browser__svg-container {
+  background-color: #f9f9f9;
+}
+
+.map__browser__loading {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(200, 200, 200, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (min-width: 768px) {
+  .map__browser__container {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    max-width: 750px;
+    margin: auto;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    position: relative;
+  }
+}
+</style>

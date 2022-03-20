@@ -1,65 +1,69 @@
 <template>
   <div class="map__municipalities">
-    <div class="map__municipalities__container">
-      <div class="map__loading" v-if="isLoading">
-        <LoadingBars/>
-      </div>
-      <svg
-        id="municipalities-svg"
-        :width="width"
-        :height="height"
-      >
-        <g>
-          <path
-            v-for="(visualizationData, index) in visualizationDataList"
-            class="map__municipality"
-            :d="path(visualizationData.feature)"
-            :key="index"
-            :description="visualizationData.name"
-            :citycode="visualizationData.code"
-            :fill="visualizationData.color"
-            @click="handleClick(visualizationData)"
-          >
-            <title>{{ visualizationData.name }}</title>
-          </path>
-        </g>
-      </svg>
-    </div>
-    <div class="map__municipalities__details">
-      <label for="select-visualizations">Year: {{selectedYear}}</label>
-      <input type="range" min="2010" max="2019" v-model.number="selectedYear">
-      <button @click="playMap" :disabled="isPlaying">Play</button>
-      <hr>
-      <label for="select-visualizations">Visualization:</label>
-      <select
-        name="visualizations"
-        id="select-visualizations"
-        @change="handleVisualizationChange"
-      >
-        <option
-          v-for="opt in visualizationOptions"
-          :value="opt.value"
-          :key="opt.value"
+    <MapBrowser :isLoading="isLoading">
+      <template v-slot:map-svg>
+        <svg
+          id="municipalities-svg"
+          :width="width"
+          :height="height"
         >
-          {{opt.label}}
-        </option>
-      </select>
-      <p><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
-      <p><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
-      <h4>Municipality</h4>
-      <template v-if="selectedCity.cityName">
-        <p><strong>Name:</strong> {{ selectedCity.cityName }}</p>
-        <p><strong>Gdp:</strong> {{ formatCurrencyBrl(selectedCity.cityGdp) }}</p>
-        <p><strong>Gdp Per Capita:</strong> {{ formatCurrencyBrl(selectedCity.cityGdpPerCapita) }}</p>
+          <g>
+            <path
+              v-for="(visualizationData, index) in visualizationDataList"
+              class="map__municipality"
+              :d="path(visualizationData.feature)"
+              :key="index"
+              :description="visualizationData.name"
+              :citycode="visualizationData.code"
+              :fill="visualizationData.color"
+              @click="handleClick(visualizationData)"
+            >
+              <title>{{ visualizationData.name }}</title>
+            </path>
+          </g>
+        </svg>
       </template>
-      <p v-else>
-        None selected
-      </p>
-    </div>
+
+      <template v-slot:browser-options>
+        <label for="select-visualizations">Year: {{selectedYear}}</label>
+        <input type="range" min="2010" max="2019" v-model.number="selectedYear">
+        <button @click="playMap" :disabled="isPlaying">Play</button>
+        <hr>
+        <label for="select-visualizations">Visualization:</label>
+        <select
+          name="visualizations"
+          id="select-visualizations"
+          @change="handleVisualizationChange"
+        >
+          <option
+            v-for="opt in visualizationOptions"
+            :value="opt.value"
+            :key="opt.value"
+          >
+            {{opt.label}}
+          </option>
+        </select>
+        <p><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
+        <p><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
+      </template>
+
+      <template v-slot:browser-details>
+        <h4>Municipality</h4>
+        <template v-if="selectedCity.cityName">
+          <p><strong>Name:</strong> {{ selectedCity.cityName }}</p>
+          <p><strong>Gdp:</strong> {{ formatCurrencyBrl(selectedCity.cityGdp) }}</p>
+          <p><strong>Gdp Per Capita:</strong> {{ formatCurrencyBrl(selectedCity.cityGdpPerCapita) }}</p>
+        </template>
+        <p v-else>
+          Select a city to view details
+        </p>
+      </template>
+    </MapBrowser>
   </div>
 </template>
 
 <script lang="ts">
+import * as d3 from "d3";
 import { computed, defineComponent, onBeforeMount, ref, reactive, watch } from 'vue';
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
@@ -70,10 +74,8 @@ import { fetchData } from '@/repositories/MunicipalityRepository';
 import { formatCurrencyBrl } from '@/utils/formatters';
 import { sleep } from '@/utils/timeHelper';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
-import LoadingBars from '@/components/LoadingBars.vue';
-import svgPanZoom from 'svg-pan-zoom'
+import MapBrowser from '@/components/MapBrowser.vue';
 
-import * as d3 from "d3";
 const getColorFunction = (dataset: number[]) => {
   // Between [0, 1], 5 numbers for 5 tones.
   const scaleOfColor = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
@@ -91,7 +93,7 @@ export default defineComponent({
   name: 'BrazilMunicipalitiesView',
 
   components: {
-    LoadingBars,
+    MapBrowser,
   },
 
   setup() {
@@ -160,7 +162,6 @@ export default defineComponent({
       })
 
       computeDetails()
-      setPanZoom()
     }
 
     const handleClick = (municipality: MunicipalitiesData) => {
@@ -222,12 +223,6 @@ export default defineComponent({
       isPlaying.value = false
     }
 
-    const setPanZoom = () => {
-      sleep(500).then(() => {
-        svgPanZoom('#municipalities-svg');
-      })
-    }
-    
     watch(
       () => selectedCity.cityCode,
       (code, prevCode) => {
@@ -242,12 +237,10 @@ export default defineComponent({
 
     watch(selectedVisualization, () => {
       computeDetails()
-      setPanZoom()
     })
 
     watch(selectedYear, () => {
       computeDetails()
-      setPanZoom()
     })
 
     return {
@@ -273,26 +266,8 @@ export default defineComponent({
 
 <style>
 .map__municipalities {
-  display: grid;
-  grid-template-columns: 1fr 200px;
   max-width: 750px;
   margin: auto;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  position: relative;
-}
-
-.map__municipalities__container {
-  background-color: #f9f9f9;
-}
-
-.map__loading {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(200, 200, 200, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .map__municipality {
@@ -306,15 +281,5 @@ export default defineComponent({
   opacity: 0.7;
   stroke-width: 3;
   stroke: #cccccc;
-}
-
-.map__municipalities__details {
-  padding: 24px;
-  text-align: left;
-  background-color: #e3e3e3;
-}
-
-.map__municipalities__details p {
-  font-size: 12px;
 }
 </style>
