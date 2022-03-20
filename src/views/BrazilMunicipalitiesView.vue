@@ -4,7 +4,11 @@
       <div class="map__loading" v-if="isLoading">
         <LoadingBars/>
       </div>
-      <svg :width="width" :height="height">
+      <svg
+        id="municipalities-svg"
+        :width="width"
+        :height="height"
+      >
         <g>
           <path
             v-for="(visualizationData, index) in visualizationDataList"
@@ -67,6 +71,7 @@ import { formatCurrencyBrl } from '@/utils/formatters';
 import { sleep } from '@/utils/timeHelper';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import LoadingBars from '@/components/LoadingBars.vue';
+import svgPanZoom from 'svg-pan-zoom'
 
 import * as d3 from "d3";
 const getColorFunction = (dataset: number[]) => {
@@ -155,6 +160,7 @@ export default defineComponent({
       })
 
       computeDetails()
+      setPanZoom()
     }
 
     const handleClick = (municipality: MunicipalitiesData) => {
@@ -215,6 +221,12 @@ export default defineComponent({
       }
       isPlaying.value = false
     }
+
+    const setPanZoom = () => {
+      sleep(500).then(() => {
+        svgPanZoom('#municipalities-svg');
+      })
+    }
     
     watch(
       () => selectedCity.cityCode,
@@ -230,10 +242,12 @@ export default defineComponent({
 
     watch(selectedVisualization, () => {
       computeDetails()
+      setPanZoom()
     })
 
     watch(selectedYear, () => {
       computeDetails()
+      setPanZoom()
     })
 
     return {
