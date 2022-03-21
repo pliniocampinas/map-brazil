@@ -25,10 +25,6 @@
       </template>
 
       <template v-slot:browser-options>
-        <label for="select-visualizations">Year: {{selectedYear}}</label>
-        <input type="range" min="2010" max="2019" v-model.number="selectedYear">
-        <button @click="playMap" :disabled="isPlaying">Play</button>
-        <hr>
         <label for="select-visualizations">Visualization:</label>
         <select
           name="visualizations"
@@ -45,6 +41,11 @@
         </select>
         <p><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
         <p><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
+        <div class="timeline-control">
+          <label for="select-visualizations">Year: {{selectedYear}}</label>
+          <input type="range" min="2010" max="2019" v-model.number="selectedYear" style="width: 80%;">
+          <button @click="playMap" :disabled="isPlaying">Play</button>
+        </div>
       </template>
 
       <template v-slot:browser-details>
@@ -274,6 +275,10 @@ export default defineComponent({
   stroke: #232323;
   stroke-width: 0;
   cursor: pointer;
+}
+
+.timeline-control {
+  width: 100%;
 }
 
 .map__municipality:hover,

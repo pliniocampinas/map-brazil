@@ -3,13 +3,13 @@
     <div class="map__browser__loading" v-if="isLoading">
       <LoadingBars/>
     </div>
-    
-    <div class="map__browser__svg-container">
-      <slot name="map-svg"></slot>
-    </div>
 
     <div class="map__browser__options">
       <slot name="browser-options"></slot>
+    </div>
+    
+    <div class="map__browser__svg-container">
+      <slot name="map-svg"></slot>
     </div>
 
     <div class="map__browser__details">
@@ -79,10 +79,18 @@ export default defineComponent({
   justify-content: center;
 }
 
+.map__browser__options {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  column-gap: 12px;
+  padding: 8px 12px;
+}
+
 @media screen and (min-width: 768px) {
   .map__browser__container {
     display: grid;
-    grid-template-columns: 1fr 200px;
     max-width: 750px;
     margin: auto;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
