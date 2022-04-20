@@ -26,23 +26,16 @@
 
       <template v-slot:browser-options>
         <label for="select-visualizations">Visualization:</label>
-        <select
+        <SimpleSelect
           name="visualizations"
           id="select-visualizations"
+          :options="visualizationOptions"
           @change="handleVisualizationChange"
-        >
-          <option
-            v-for="opt in visualizationOptions"
-            :value="opt.value"
-            :key="opt.value"
-          >
-            {{opt.label}}
-          </option>
-        </select>
+        />
         <p><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
         <p><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
         <div class="timeline-control">
-          <label for="select-visualizations">Year: {{selectedYear}}</label>
+          <label>Year: {{selectedYear}}</label>
           <input type="range" min="2010" max="2019" v-model.number="selectedYear" style="width: 80%;">
           <button @click="playMap" :disabled="isPlaying">Play</button>
         </div>
@@ -76,6 +69,7 @@ import { formatCurrencyBrl } from '@/utils/formatters';
 import { sleep } from '@/utils/timeHelper';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import MapBrowser from '@/components/MapBrowser.vue';
+import SimpleSelect from '@/components/SimpleSelect.vue';
 
 const getColorFunction = (dataset: number[]) => {
   // Between [0, 1], 5 numbers for 5 tones.
@@ -95,6 +89,7 @@ export default defineComponent({
 
   components: {
     MapBrowser,
+    SimpleSelect,
   },
 
   setup() {
@@ -172,8 +167,8 @@ export default defineComponent({
       selectedCity.cityGdpPerCapita = municipality.gdpPerCapitaBrl?? 0
     }
 
-    const handleVisualizationChange = ({ target }: { target: HTMLInputElement }) => {
-      selectedVisualization.value = target.value
+    const handleVisualizationChange = (value: string) => {
+      selectedVisualization.value = value
     }
 
     const getPathElement = (code: string) => {
