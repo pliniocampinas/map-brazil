@@ -69,9 +69,6 @@ export default defineComponent({
       if(index === (props.currentValue - props.firstValue + 1)) {
         return 'timeline-control__tick--active'
       }
-      if(index < (props.currentValue - props.firstValue + 1)) {
-        return 'timeline-control__tick--filled'
-      }
       return ''
     }
 
@@ -107,17 +104,13 @@ export default defineComponent({
 
 .timeline-control__tick {
   cursor: pointer;
-  background-color: whitesmoke;
+  background-color: var(--app-primary-color);
   border: 1px solid black;
   box-sizing: border-box;
 }
 
-.timeline-control__tick--filled {
-  background-color: lightseagreen;
-}
-
 .timeline-control__tick--active {
-  background-color: green;
+  background-color: var(--app-secondary-color);
 }
 
 .time-line__play-button {

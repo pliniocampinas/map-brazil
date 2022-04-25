@@ -40,6 +40,11 @@ function isLastLink(index: number) {
 </script>
 
 <style>
+:root {
+  --app-primary-color: #2c3e50;
+  --app-secondary-color: #42b983;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -60,4 +65,6 @@ nav a {
 nav a.router-link-exact-active {
   color: #42b983;
 }
+
+
 </style>
