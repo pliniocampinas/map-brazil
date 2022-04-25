@@ -34,11 +34,13 @@
         />
         <p><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
         <p><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
-        <div class="timeline-control">
-          <label>Year: {{selectedYear}}</label>
-          <input type="range" min="2010" max="2019" v-model.number="selectedYear" style="width: 80%;">
-          <button @click="playMap" :disabled="isPlaying">Play</button>
-        </div>
+        <TimelineControl
+          :currentValue="selectedYear"
+          :firstValue="FIRST_YEAR"
+          :isPlaying="isPlaying"
+          @play="playMap"
+          @tick="handleTick"
+        />
       </template>
 
       <template v-slot:browser-details>
@@ -70,6 +72,7 @@ import { sleep } from '@/utils/timeHelper';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import MapBrowser from '@/components/MapBrowser.vue';
 import SimpleSelect from '@/components/SimpleSelect.vue';
+import TimelineControl from '@/components/TimelineControl.vue';
 
 const getColorFunction = (dataset: number[]) => {
   // Between [0, 1], 5 numbers for 5 tones.
@@ -90,9 +93,12 @@ export default defineComponent({
   components: {
     MapBrowser,
     SimpleSelect,
+    TimelineControl,
   },
 
   setup() {
+    const FIRST_YEAR = 2010
+    const LAST_YEAR = 2019
     const width = 500
     const height = 550
     const visualizationOptions = [
@@ -106,7 +112,7 @@ export default defineComponent({
       }
     ]
     const selectedVisualization = ref('gdp-per-capita')
-    const selectedYear = ref(2019)
+    const selectedYear = ref(LAST_YEAR)
     const minValue = ref(0)
     const maxValue = ref(0)
     const isLoading = ref(false)
@@ -211,12 +217,16 @@ export default defineComponent({
 
     const playMap = async () => {
       isPlaying.value = true
-      selectedYear.value = 2010
-      while(selectedYear.value !== 2019) {
+      selectedYear.value = FIRST_YEAR
+      while(selectedYear.value !== LAST_YEAR) {
         await sleep(700)
         selectedYear.value++
       }
       isPlaying.value = false
+    }
+
+    const handleTick = (index: number) => {
+      selectedYear.value = FIRST_YEAR + index
     }
 
     watch(
@@ -240,6 +250,7 @@ export default defineComponent({
     })
 
     return {
+      FIRST_YEAR,
       width,
       height,
       visualizationOptions,
@@ -255,6 +266,7 @@ export default defineComponent({
       handleClick,
       handleVisualizationChange,
       playMap,
+      handleTick,
     }
   }
 });
@@ -270,10 +282,6 @@ export default defineComponent({
   stroke: #232323;
   stroke-width: 0;
   cursor: pointer;
-}
-
-.timeline-control {
-  width: 100%;
 }
 
 .map__municipality:hover,
