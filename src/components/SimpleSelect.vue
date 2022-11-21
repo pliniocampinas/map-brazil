@@ -21,6 +21,7 @@ export default defineComponent({
 
   props: {
     options: {
+      // eslint-disable-next-line
       type: Array as PropType<Array<{ label: string, value: any }>>,
       default: null
     },

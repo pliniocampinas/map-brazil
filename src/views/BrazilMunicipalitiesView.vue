@@ -9,13 +9,12 @@
         >
           <g>
             <path
-              v-for="(visualizationData, index) in visualizationDataList"
+              v-for="(visualizationData, index) in municipalitiesList2019"
               class="map__municipality"
               :d="path(visualizationData.feature)"
               :key="index"
               :description="visualizationData.name"
               :citycode="visualizationData.code"
-              :fill="visualizationData.color"
               @click="handleClick(visualizationData)"
             >
               <title>{{ visualizationData.name }}</title>
@@ -60,7 +59,7 @@
 
 <script lang="ts">
 import * as d3 from "d3";
-import { computed, defineComponent, onBeforeMount, ref, reactive, watch } from 'vue';
+import { computed, defineComponent, onBeforeMount, ref, reactive, watch, nextTick } from 'vue';
 import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
 import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
@@ -135,6 +134,7 @@ export default defineComponent({
 
     const features = geoData.features?? []
     const municipalitiesList = ref<MunicipalitiesData[]>([])
+    const municipalitiesList2019 = ref<MunicipalitiesData[]>([])
 
     // D3 expects geometry coordinates to be clockwise, 
     // otherwise some paths might be rendered too large 
@@ -162,8 +162,12 @@ export default defineComponent({
           feature: municipalityFeature
         }
       })
+      municipalitiesList2019.value = municipalitiesList.value.filter(m => m.year === LAST_YEAR)
 
       computeDetails()
+      nextTick(() => {
+        colorizePaths()
+      })
     }
 
     const handleClick = (municipality: MunicipalitiesData) => {
@@ -179,6 +183,20 @@ export default defineComponent({
 
     const getPathElement = (code: string) => {
       return document.querySelector(`path[citycode="${code}"]`)
+    }
+
+    const colorizePaths = () => {
+      const mainValues = municipalitiesList.value
+        .filter(d => d.year === selectedYear.value)
+        .map(municipality => getMainAttribute(municipality))
+      const getColor = getColorFunction(mainValues)
+      currentVisualizationDataList.value.forEach(d => {
+        const color = getColor(getMainAttribute(d))
+        const pathElement = document.querySelector(`path[citycode="${d.code}"]`)
+        if(pathElement) {
+          pathElement.setAttribute("fill", color+'')
+        }
+      })
     }
 
     const computeDetails = () => {
@@ -199,20 +217,8 @@ export default defineComponent({
       return 0
     }
     
-    const visualizationDataList = computed(() => {
-      const mainValues = municipalitiesList.value
-        .map(municipality => getMainAttribute(municipality))
-        .map(value => value > 0? value: 0)
-      const getColor = getColorFunction(mainValues)
-      return municipalitiesList.value
-        .filter(d => d.year === selectedYear.value)
-        .map(municipality => {
-        return {
-          ...municipality,
-          visualizationAttribute: getMainAttribute(municipality),
-          color: getColor(getMainAttribute(municipality))
-        }
-      })
+    const currentVisualizationDataList = computed(() => {
+      return municipalitiesList.value.filter(d => d.year === selectedYear.value)
     })
 
     const playMap = async () => {
@@ -243,10 +249,12 @@ export default defineComponent({
 
     watch(selectedVisualization, () => {
       computeDetails()
+      colorizePaths()
     })
 
     watch(selectedYear, () => {
       computeDetails()
+      colorizePaths()
     })
 
     return {
@@ -260,7 +268,7 @@ export default defineComponent({
       maxValue,
       selectedCity,
       selectedYear,
-      visualizationDataList,
+      municipalitiesList2019,
       path: geoPath(projection),
       formatCurrencyBrl,
       handleClick,
