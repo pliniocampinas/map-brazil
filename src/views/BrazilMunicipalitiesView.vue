@@ -100,6 +100,7 @@ export default defineComponent({
     const LAST_YEAR = 2019
     const width = 500
     const height = 550
+    const pathElementsMap: any = {}
     const visualizationOptions = [
       {
         label: 'Gdp per Capita',
@@ -186,15 +187,28 @@ export default defineComponent({
     }
 
     const colorizePaths = () => {
+      const firstRender = !municipalitiesList2019.value[0].pathElement
+      if(firstRender) {
+        municipalitiesList2019.value.forEach(d => {
+          if(!d.pathElement) {
+            const pathElement = document.querySelector(`path[citycode="${d.code}"]`)
+            d.pathElement = pathElement
+            pathElementsMap[d.code] = pathElement
+          }
+        })
+      }
+
       const mainValues = municipalitiesList.value
         .filter(d => d.year === selectedYear.value)
         .map(municipality => getMainAttribute(municipality))
       const getColor = getColorFunction(mainValues)
       currentVisualizationDataList.value.forEach(d => {
         const color = getColor(getMainAttribute(d))
-        const pathElement = document.querySelector(`path[citycode="${d.code}"]`)
-        if(pathElement) {
-          pathElement.setAttribute("fill", color+'')
+        if(!d.pathElement) {
+          d.pathElement = pathElementsMap[d.code]
+        }
+        if(d.pathElement) {
+          d.pathElement.setAttribute("fill", color+'')
         }
       })
     }
