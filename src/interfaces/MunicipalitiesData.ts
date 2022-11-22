@@ -5,5 +5,5 @@ export default interface MunicipalitiesData {
   state: string
   code: string
   name: string
-  pathElement: Element | null
+  pathElement?: Element | null
 }

@@ -100,7 +100,7 @@ export default defineComponent({
     const LAST_YEAR = 2019
     const width = 500
     const height = 550
-    const pathElementsMap: any = {}
+    const pathElementsMap: { [code: string] : Element | null; } = {}
     const visualizationOptions = [
       {
         label: 'Gdp per Capita',
