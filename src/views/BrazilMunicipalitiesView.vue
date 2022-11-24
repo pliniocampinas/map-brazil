@@ -65,7 +65,7 @@ import { feature } from 'topojson-client'
 import { GeometryObject, Topology } from 'topojson-specification';
 import { geoPath, geoEqualEarth, min, max } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
-import { fetchData } from '@/repositories/MunicipalityRepository';
+import { fetchData } from '@/services/GetCityGdpService';
 import { formatCurrencyBrl } from '@/utils/formatters';
 import { sleep } from '@/utils/timeHelper';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
@@ -154,16 +154,21 @@ export default defineComponent({
 
     const loadData = async () => {
       isLoading.value = true
-      const data = await fetchData()
-      isLoading.value = false
-      municipalitiesList.value = data.map(municipality => {
+      try {
+        const data = await fetchData()
+        municipalitiesList.value = data.map(municipality => {
         const municipalityFeature = features.find(feature => municipality.code === feature.properties?.id)
-        return {
-          ...municipality,
-          feature: municipalityFeature
-        }
-      })
-      municipalitiesList2019.value = municipalitiesList.value.filter(m => m.year === LAST_YEAR)
+          return {
+            ...municipality,
+            feature: municipalityFeature
+          }
+        })
+        municipalitiesList2019.value = municipalitiesList.value.filter(m => m.year === LAST_YEAR)
+
+        isLoading.value = false
+      } catch(err) {
+        isLoading.value = false
+      }
 
       computeDetails()
       nextTick(() => {
