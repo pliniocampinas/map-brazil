@@ -1,6 +1,6 @@
 <template>
-  <div class="geographic_features">
-    <div class="geographic_features__container">
+  <div class="semi-arid">
+    <div class="semi-arid__container">
       
     </div>
   </div>
@@ -11,7 +11,7 @@ import { defineComponent, ref, onMounted } from 'vue';
 import LoadingBars from '@/components/LoadingBars.vue';
 
 export default defineComponent({
-  name: 'GeographicFeaturesView',
+  name: 'SemiAridView',
 
   components: {
     LoadingBars,
@@ -33,7 +33,7 @@ export default defineComponent({
 </script>
 
 <style>
-.geographic_features {
+.semi-arid {
   display: grid;
   grid-template-columns: 1fr;
   max-width: 750px;
@@ -42,7 +42,7 @@ export default defineComponent({
   position: relative;
 }
 
-.geographic_features__container {
+.semi-arid__container {
   background-color: #f9f9f9;
 }
 </style>

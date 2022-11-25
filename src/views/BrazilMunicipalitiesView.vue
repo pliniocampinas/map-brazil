@@ -2,11 +2,7 @@
   <div class="map__municipalities">
     <MapBrowser :isLoading="isLoading">
       <template v-slot:map-svg>
-        <svg
-          id="municipalities-svg"
-          :width="width"
-          :height="height"
-        >
+        <svg id="municipalities-svg">
           <g>
             <path
               v-for="(visualizationData, index) in municipalitiesList2019"
@@ -24,15 +20,17 @@
       </template>
 
       <template v-slot:browser-options>
-        <label for="select-visualizations">Visualization:</label>
-        <SimpleSelect
-          name="visualizations"
-          id="select-visualizations"
-          :options="visualizationOptions"
-          @change="handleVisualizationChange"
-        />
-        <p><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
-        <p><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
+        <div>
+          <label for="select-visualizations">Visualization:</label>
+          <SimpleSelect
+            name="visualizations"
+            id="select-visualizations"
+            :options="visualizationOptions"
+            @change="handleVisualizationChange"
+          />
+        </div>
+        <p class="my-1"><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
+        <p class="my-1"><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
         <TimelineControl
           :currentValue="selectedYear"
           :firstValue="FIRST_YEAR"
@@ -49,9 +47,13 @@
           <p><strong>Gdp:</strong> {{ formatCurrencyBrl(selectedCity.cityGdp) }}</p>
           <p><strong>Gdp Per Capita:</strong> {{ formatCurrencyBrl(selectedCity.cityGdpPerCapita) }}</p>
         </template>
-        <p v-else>
-          Select a city to view details
-        </p>
+        <template v-else>
+          <p>
+            Select a city to view details
+          </p>
+          <p style="visibility: hidden;">Placeholder</p>
+          <p style="visibility: hidden;">Placeholder</p>
+        </template>
       </template>
     </MapBrowser>
   </div>
@@ -164,16 +166,15 @@ export default defineComponent({
           }
         })
         municipalitiesList2019.value = municipalitiesList.value.filter(m => m.year === LAST_YEAR)
-
         isLoading.value = false
+
+        computeDetails()
+        nextTick(() => {
+          colorizePaths()
+        })
       } catch(err) {
         isLoading.value = false
       }
-
-      computeDetails()
-      nextTick(() => {
-        colorizePaths()
-      })
     }
 
     const handleClick = (municipality: MunicipalitiesData) => {
@@ -316,5 +317,10 @@ export default defineComponent({
   opacity: 0.7;
   stroke-width: 3;
   stroke: #cccccc;
+}
+
+#municipalities-svg {
+  width:  auto;
+  height: 400px;
 }
 </style>

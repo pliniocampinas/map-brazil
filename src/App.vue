@@ -66,5 +66,9 @@ nav a.router-link-exact-active {
   color: #42b983;
 }
 
+.my-1 {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
 
 </style>

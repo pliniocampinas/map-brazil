@@ -81,6 +81,7 @@ export default defineComponent({
 
 .map__browser__options {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: space-evenly;
   flex-wrap: wrap;
@@ -95,6 +96,10 @@ export default defineComponent({
     margin: auto;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     position: relative;
+  }
+
+  .map__browser__options {
+    flex-direction: row;
   }
 }
 </style>
