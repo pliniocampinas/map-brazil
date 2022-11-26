@@ -1,29 +1,19 @@
 <template>
-  <div class="map__municipalities">
-    <MapBrowser :isLoading="isLoading">
-      <template v-slot:map-svg>
-        <svg>
-          <g>
-            <path
-              v-for="(visualizationData, index) in municipalitiesList"
-              class="map__municipality"
-              :d="path(visualizationData.feature)"
-              :key="index"
-              :description="visualizationData.name"
-              :citycode="visualizationData.code"
-            >
-              <title>{{ visualizationData.name }}</title>
-            </path>
-          </g>
-        </svg>
-      </template>
-
-      <template v-slot:browser-options>
-      </template>
-
-      <template v-slot:browser-details>
-      </template>
-    </MapBrowser>
+  <div class="render-brazil-map__container">
+    <svg id="municipalities-svg">
+      <g>
+        <path
+          v-for="(visualizationData, index) in municipalitiesList"
+          class="map__municipality"
+          :d="path(visualizationData.feature)"
+          :key="index"
+          :description="visualizationData.name"
+          :citycode="visualizationData.code"
+        >
+          <title>{{ visualizationData.name }}</title>
+        </path>
+      </g>
+    </svg>
   </div>
 </template>
 
@@ -36,14 +26,9 @@ import { geoPath, geoEqualEarth } from 'd3';
 import { FeatureCollection, rewind } from '@turf/turf';
 import { fetchData } from '@/services/GetCityGdpService';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
-import MapBrowser from '@/components/MapBrowser.vue';
 
 export default defineComponent({
   name: 'RenderBrazilMapView',
-
-  components: {
-    MapBrowser,
-  },
 
   setup() {
     const topology = (municipalitiesTopoJson as unknown) as Topology
@@ -98,8 +83,13 @@ export default defineComponent({
 </script>
 
 <style>
+.render-brazil-map__container {
+  border: 1px solid black;
+}
+
 #municipalities-svg {
-  width:  auto;
-  height: 400px;
+  width:  450px;
+  height: 550px;
+  border: 1px solid black;
 }
 </style>

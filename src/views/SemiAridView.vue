@@ -1,32 +1,31 @@
 <template>
   <div class="semi-arid">
     <div class="semi-arid__container">
-      
+      <BrazilMunicipalitiesMap
+        @loaded="svgLoaded"
+        class="semi-arid__map"
+      >
+      </BrazilMunicipalitiesMap>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
-import LoadingBars from '@/components/LoadingBars.vue';
+import { defineComponent } from 'vue';
+import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 
 export default defineComponent({
   name: 'SemiAridView',
 
   components: {
-    LoadingBars,
+    BrazilMunicipalitiesMap,
   },
 
   setup() {
-    const chartContainerElement = ref(null as HTMLElement | null)
-    const isLoading = ref(false)
-
-    onMounted(async () => {
-    })
 
     return {
-      isLoading,
-      chartContainerElement,
+      svgLoaded: () => console.log('svgLoaded'),
+      svgLoadError: () => console.log('svgLoadError'),
     }
   }
 });
@@ -44,5 +43,9 @@ export default defineComponent({
 
 .semi-arid__container {
   background-color: #f9f9f9;
+}
+
+.semi-arid__map {
+  height: 500px;
 }
 </style>

@@ -22,6 +22,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'RenderBrazilMap',
     component: () => import(/* webpackChunkName: "render-map-view" */ '../views/RenderBrazilMapView.vue')
   },
+  {
+    path: '/maps/semi-arid',
+    name: 'SemiArid',
+    component: () => import(/* webpackChunkName: "semi-arid-view" */ '../views/SemiAridView.vue')
+  },
 ]
 
 const router = createRouter({
