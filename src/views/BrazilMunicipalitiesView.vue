@@ -100,8 +100,6 @@ export default defineComponent({
   setup() {
     const FIRST_YEAR = 2010
     const LAST_YEAR = 2019
-    const width = 500
-    const height = 550
     const pathElementsMap: { [code: string] : Element | null; } = {}
     const visualizationOptions = [
       {
@@ -279,8 +277,6 @@ export default defineComponent({
 
     return {
       FIRST_YEAR,
-      width,
-      height,
       visualizationOptions,
       isLoading,
       isPlaying,

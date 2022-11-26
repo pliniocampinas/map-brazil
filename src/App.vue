@@ -26,11 +26,7 @@ const navLinks = [
   {
     text: 'Municipalities Map',
     to: '/maps/brazil-municipalities',
-  },
-  {
-    text: 'Municipalities BoxPlot',
-    to: '/plots/brazil-municipalities-boxplot',
-  },
+  }
 ]
 
 // functions

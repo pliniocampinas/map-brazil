@@ -16,12 +16,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/maps/brazil-municipalities',
     name: 'BrazilMunicipalities',
     component: () => import(/* webpackChunkName: "municipalities-view" */ '../views/BrazilMunicipalitiesView.vue')
-  },
-  {
-    path: '/plots/brazil-municipalities-boxplot',
-    name: 'BrazilMunicipalitiesBoxplot',
-    component: () => import(/* webpackChunkName: "boxplot-municipalities-view" */ '../views/BrazilMunicipalitiesBoxPlotView.vue')
-  },
+  }
 ]
 
 const router = createRouter({
