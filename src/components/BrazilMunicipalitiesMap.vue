@@ -1,5 +1,5 @@
 <template>
-  <div class="municipalities-map">
+  <div class="municipalities-map" ref="chartContainerElement">
     <inline-svg 
       :src="require('../assets/municipalities-map.svg')"
       @loaded="svgLoaded"
@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import InlineSvg from 'vue-inline-svg';
 import svgPanZoom from 'svg-pan-zoom'
 
@@ -22,7 +22,15 @@ export default defineComponent({
     InlineSvg,
   },
 
-  setup(_, { emit }) {
+  props: {
+    selectedCityCode: {
+      type: String,
+      default: null
+    },
+  },
+
+  setup(props, { emit }) {
+    const chartContainerElement = ref(null as HTMLElement | null)
     const svgLoadError = (e: Error) => {
       console.warn('svgLoadError', e)
     }
@@ -30,9 +38,30 @@ export default defineComponent({
     const svgLoaded = () => {
       svgPanZoom('.municipalities-map svg')
       emit('loaded')
+
+      chartContainerElement.value?.querySelectorAll('path').forEach(pathElement => {
+        pathElement.addEventListener('click', () => emit('city-click', pathElement.getAttribute('citycode')))
+      })
     }
 
+    const getPathElement = (code: string) => {
+      return chartContainerElement.value?.querySelector(`path[citycode="${code}"]`)
+    }
+
+    watch(
+      () => props.selectedCityCode,
+      (code, prevCode) => {
+        if(prevCode) {
+          const previouslySelectedPathElement = getPathElement(prevCode)
+          previouslySelectedPathElement?.classList.remove('map__municipality--selected')
+        }
+        const selectedPathElement = getPathElement(code)
+        selectedPathElement?.classList.add('map__municipality--selected')
+      }
+    )
+
     return {
+      chartContainerElement,
       svgLoadError,
       svgLoaded,
     }

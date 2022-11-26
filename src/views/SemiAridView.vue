@@ -2,8 +2,10 @@
   <div class="semi-arid">
     <div class="semi-arid__container">
       <BrazilMunicipalitiesMap
-        @loaded="svgLoaded"
         class="semi-arid__map"
+        :selectedCityCode="selectedCity"
+        @loaded="svgLoaded"
+        @city-click="cityClick"
       >
       </BrazilMunicipalitiesMap>
     </div>
@@ -11,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 
 export default defineComponent({
@@ -22,10 +24,19 @@ export default defineComponent({
   },
 
   setup() {
+    const selectedCity = ref('')
 
     return {
+      selectedCity,
       svgLoaded: () => console.log('svgLoaded'),
       svgLoadError: () => console.log('svgLoadError'),
+      cityClick: (code: string) => {
+        if(selectedCity.value == code) {
+          selectedCity.value = ''
+          return
+        }
+        selectedCity.value = code;
+      },
     }
   }
 });
