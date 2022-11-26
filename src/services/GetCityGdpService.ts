@@ -14,8 +14,8 @@ const toMunicipality = (city: CityGdp) => {
   }
 }
 
-export const fetchData = async () : Promise<MunicipalitiesData[]> => {
-  const response = await fetch(`${baseUrl}/cities/gdp`)
+export const fetchData = async (year = 0) : Promise<MunicipalitiesData[]> => {
+  const response = await fetch(`${baseUrl}/cities/gdp${year?'?year='+year:''}`)
     .then(response => response.json()) as CityGdp[]
 
   return response.map(toMunicipality)
