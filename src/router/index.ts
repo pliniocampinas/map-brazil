@@ -23,9 +23,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "render-map-view" */ '../views/RenderBrazilMapView.vue')
   },
   {
-    path: '/maps/semi-arid',
-    name: 'SemiArid',
-    component: () => import(/* webpackChunkName: "semi-arid-view" */ '../views/SemiAridView.vue')
+    path: '/maps/geo-features',
+    name: 'CityGeographicFeatures',
+    component: () => import(/* webpackChunkName: "geo-features-view" */ '../views/CityGeographicFeaturesView.vue')
   },
 ]
 

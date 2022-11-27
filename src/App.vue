@@ -28,8 +28,8 @@ const navLinks = [
     to: '/maps/brazil-municipalities',
   },
   {
-    text: 'Mapa semi-árido',
-    to: '/maps/semi-arid',
+    text: 'Mapa características geográficas',
+    to: '/maps/geo-features',
   }
 ]
 
