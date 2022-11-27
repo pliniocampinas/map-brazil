@@ -16,8 +16,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
-import { fetchData } from '@/services/GetCityGdpService';
-import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
+import { fetchData } from '@/services/GetCitySemiAridService';
+import CitySemiArid from '@/interfaces/CitySemiArid';
 
 export default defineComponent({
   name: 'SemiAridView',
@@ -29,12 +29,12 @@ export default defineComponent({
   setup() {
     const selectedCity = ref('')
     const isLoading = ref(false)
-    const municipalitiesList = ref<MunicipalitiesData[]>([])
+    const municipalitiesList = ref<CitySemiArid[]>([])
 
     const loadData = async () => {
       isLoading.value = true
       try {
-        const data = await fetchData(2019)
+        const data = await fetchData()
         municipalitiesList.value = data
         isLoading.value = false
       } catch(err) {
@@ -44,10 +44,10 @@ export default defineComponent({
     
     const colorizePaths = (pathElementsMap: { [code: string] : Element | null; }) => {
       municipalitiesList.value.forEach(d => {
-        const pathElement = pathElementsMap[d.code]
+        const pathElement = pathElementsMap[d.cityId]
         if(pathElement) {
           pathElement.setAttribute("fill", 
-            d.gdpPerCapitaBrl > 10000? 'rgb(0, 122, 97)': 'rgb(252, 172, 99)')
+            d.isSemiArid? 'rgb(252, 172, 99)': 'rgb(0, 122, 97)')
         }
       })
     }

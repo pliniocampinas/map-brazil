@@ -24,7 +24,7 @@ const navLinks = [
     to: '/maps/brazil-states',
   },
   {
-    text: 'Municipalities Map',
+    text: 'Municipalities Gdp Map',
     to: '/maps/brazil-municipalities',
   },
   {
