@@ -21,7 +21,7 @@
 
       <template v-slot:browser-options>
         <div>
-          <label for="select-visualizations">Visualization:</label>
+          <label for="select-visualizations">Visualização:</label>
           <SimpleSelect
             name="visualizations"
             id="select-visualizations"
@@ -29,8 +29,8 @@
             @change="handleVisualizationChange"
           />
         </div>
-        <p class="my-1"><strong>Max value:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
-        <p class="my-1"><strong>Min value:</strong> {{ formatCurrencyBrl(minValue) }}</p>
+        <p class="my-1"><strong>Valor max:</strong> {{ formatCurrencyBrl(maxValue) }}</p>
+        <p class="my-1"><strong>Valor min:</strong> {{ formatCurrencyBrl(minValue) }}</p>
         <TimelineControl
           :currentValue="selectedYear"
           :firstValue="FIRST_YEAR"
@@ -41,15 +41,15 @@
       </template>
 
       <template v-slot:browser-details>
-        <h4>Municipality</h4>
+        <h4>Município</h4>
         <template v-if="selectedCity.cityName">
-          <p><strong>Name:</strong> {{ selectedCity.cityName }}</p>
-          <p><strong>Gdp:</strong> {{ formatCurrencyBrl(selectedCity.cityGdp) }}</p>
-          <p><strong>Gdp Per Capita:</strong> {{ formatCurrencyBrl(selectedCity.cityGdpPerCapita) }}</p>
+          <p><strong>Nome:</strong> {{ selectedCity.cityName }}</p>
+          <p><strong>PIB:</strong> {{ formatCurrencyBrl(selectedCity.cityGdp) }}</p>
+          <p><strong>PIB per capita:</strong> {{ formatCurrencyBrl(selectedCity.cityGdpPerCapita) }}</p>
         </template>
         <template v-else>
           <p>
-            Select a city to view details
+            Selecione uma cidade para ver detalhes
           </p>
           <p style="visibility: hidden;">Placeholder</p>
           <p style="visibility: hidden;">Placeholder</p>
@@ -103,11 +103,11 @@ export default defineComponent({
     const pathElementsMap: { [code: string] : Element | null; } = {}
     const visualizationOptions = [
       {
-        label: 'Gdp per Capita',
+        label: 'PIB per Capita',
         value: 'gdp-per-capita'
       },
       {
-        label: 'Total Gdp(1000 BRL)',
+        label: 'PIB Nominal(1000 BRL)',
         value: 'total-gdp'
       }
     ]

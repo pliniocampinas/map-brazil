@@ -20,15 +20,15 @@ const navLinks = [
     to: '/',
   },
   {
-    text: 'States Map',
+    text: 'Mapa PIB dos estados',
     to: '/maps/brazil-states',
   },
   {
-    text: 'Municipalities Gdp Map',
+    text: 'Mapa PIB municípios',
     to: '/maps/brazil-municipalities',
   },
   {
-    text: 'SemiArid Map',
+    text: 'Mapa semi-árido',
     to: '/maps/semi-arid',
   }
 ]
