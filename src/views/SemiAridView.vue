@@ -6,6 +6,7 @@
         :selectedCityCode="selectedCity"
         @loaded="svgLoaded"
         @city-click="cityClick"
+        @path-map-loaded="pathMapLoaded"
       >
       </BrazilMunicipalitiesMap>
     </div>
@@ -15,6 +16,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
+import { fetchData } from '@/services/GetCityGdpService';
+import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 
 export default defineComponent({
   name: 'SemiAridView',
@@ -25,6 +28,29 @@ export default defineComponent({
 
   setup() {
     const selectedCity = ref('')
+    const isLoading = ref(false)
+    const municipalitiesList = ref<MunicipalitiesData[]>([])
+
+    const loadData = async () => {
+      isLoading.value = true
+      try {
+        const data = await fetchData(2019)
+        municipalitiesList.value = data
+        isLoading.value = false
+      } catch(err) {
+        isLoading.value = false
+      }
+    }
+    
+    const colorizePaths = (pathElementsMap: { [code: string] : Element | null; }) => {
+      municipalitiesList.value.forEach(d => {
+        const pathElement = pathElementsMap[d.code]
+        if(pathElement) {
+          pathElement.setAttribute("fill", 
+            d.gdpPerCapitaBrl > 10000? 'rgb(0, 122, 97)': 'rgb(252, 172, 99)')
+        }
+      })
+    }
 
     return {
       selectedCity,
@@ -36,6 +62,9 @@ export default defineComponent({
           return
         }
         selectedCity.value = code;
+      },
+      pathMapLoaded: (pathMap: { [code: string] : Element | null; }) => {
+        loadData().then(() => colorizePaths(pathMap))
       },
     }
   }

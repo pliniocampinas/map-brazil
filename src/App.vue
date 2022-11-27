@@ -26,6 +26,10 @@ const navLinks = [
   {
     text: 'Municipalities Map',
     to: '/maps/brazil-municipalities',
+  },
+  {
+    text: 'SemiArid Map',
+    to: '/maps/semi-arid',
   }
 ]
 

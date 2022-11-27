@@ -31,6 +31,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const chartContainerElement = ref(null as HTMLElement | null)
+    const pathElementsMap: { [code: string] : Element | null; } = {}
     const svgLoadError = (e: Error) => {
       console.warn('svgLoadError', e)
     }
@@ -39,9 +40,19 @@ export default defineComponent({
       svgPanZoom('.municipalities-map svg')
       emit('loaded')
 
-      chartContainerElement.value?.querySelectorAll('path').forEach(pathElement => {
-        pathElement.addEventListener('click', () => emit('city-click', pathElement.getAttribute('citycode')))
-      })
+      if(!chartContainerElement.value) {
+        return
+      }
+
+      for (const pathElement of chartContainerElement.value.querySelectorAll('path')) {
+        const code = pathElement.getAttribute('citycode')
+        if(!code) {
+          continue
+        }
+        pathElement.addEventListener('click', () => emit('city-click', code))
+        pathElementsMap[code] = pathElement
+      }
+      emit('path-map-loaded', pathElementsMap)
     }
 
     const getPathElement = (code: string) => {
