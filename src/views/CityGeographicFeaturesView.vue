@@ -18,6 +18,7 @@
         <div class="geo-features__label geo-features--hover"
           v-for="(feature, index) in displayedFeatures"
           :key="index"
+          @click="showFeatureDetails(feature.key)"
         >
           <span class="geo-features__label__text geo-features--hover">
           {{feature.label}}
@@ -26,11 +27,24 @@
         </div>
       </div>
     </div>
+    <div class="geo-features-details__container">
+      <h1 class="geo-features-details__heading">Detalhes {{ selectedFeatureLabel }}</h1>
+      <template v-if="selectedFeatureLabel">
+        <div class="geo-features-details__options">
+          <div class="geo-features-details__option">PIB per Capita</div>
+          <div class="geo-features-details__option">Crescimento PIB</div>
+          <div class="geo-features-details__option">Crescimento Pop.</div>
+        </div>
+      </template>
+      <div v-else class="geo-features-details__options">
+        ---
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import { fetchData } from '@/services/GetCityGeographicFeaturesService';
 import CityGeographicFeatures from '@/interfaces/CityGeographicFeatures';
@@ -46,26 +60,32 @@ export default defineComponent({
     const displayedFeatures = [
       {
         label: 'MATOPIBA',
+        key: 'matopiba',
         color: 'rgb(180, 180, 180)',
       },
       {
         label: 'Amazônia Legal',
+        key: 'legal-amazon',
         color: 'rgb(50, 172, 50)',
       },
       {
         label: 'Semi-árido',
         color: 'rgb(252, 172, 99)',
+        key: 'semi-arid',
       },
       {
         label: 'Defrontante ao mar',
+        key: 'sea-front',
         color: 'rgb(50, 50, 180)',
       },
       {
         label: 'Outros',
+        key: 'others',
         color: 'rgb(0, 122, 97)',
       },
     ]
     const selectedCity = ref('')
+    const selectedFeature = ref('')
     const isLoading = ref(false)
     const municipalitiesList = ref<CityGeographicFeatures[]>([])
 
@@ -110,9 +130,27 @@ export default defineComponent({
       })
     }
 
+    const showFeatureDetails = (key: string) => {
+      console.log('key', key)
+      if(selectedFeature.value === key) {
+        selectedFeature.value = ''
+        return
+      }
+      selectedFeature.value = key
+      // Scroll
+      // Load
+      // Render
+    }
+
+    const selectedFeatureLabel = computed(() => {
+      return displayedFeatures.find(f => f.key===selectedFeature.value)?.label??''
+    })
+
     return {
       displayedFeatures,
       selectedCity,
+      selectedFeature,
+      selectedFeatureLabel,
       svgLoaded: () => console.log('svgLoaded'),
       svgLoadError: () => console.log('svgLoadError'),
       cityClick: (code: string) => {
@@ -125,6 +163,7 @@ export default defineComponent({
       pathMapLoaded: (pathMap: { [code: string] : Element | null; }) => {
         loadData().then(() => colorizePaths(pathMap))
       },
+      showFeatureDetails,
     }
   }
 });
@@ -199,5 +238,16 @@ export default defineComponent({
 
 .geo-features__map {
   height: 500px;
+}
+
+.geo-features-details__options {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.geo-features-details__option {
+  border: 1px solid black;
+  padding: 4px;
 }
 </style>
