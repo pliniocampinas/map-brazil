@@ -1,6 +1,9 @@
 <template>
   <div class="geo-features">
     <div class="geo-features__container">
+      <div class="geo-features__loading" v-if="isLoading">
+        <LoadingBars/>
+      </div>
       <BrazilMunicipalitiesMap
         class="geo-features__map"
         :selectedCityCode="selectedCity"
@@ -35,6 +38,11 @@
           <div class="geo-features-details__option">Crescimento PIB</div>
           <div class="geo-features-details__option">Crescimento Pop.</div>
         </div>
+        <div class="geo-features-details__graph">
+          <div class="geo-features-details__loading" v-if="isDetailsLoading">
+            <LoadingBars/>
+          </div>
+        </div>
       </template>
       <div v-else class="geo-features-details__options">
         ---
@@ -44,16 +52,19 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, nextTick, ref } from 'vue';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
+import LoadingBars from '@/components/LoadingBars.vue';
 import { fetchData } from '@/services/GetCityGeographicFeaturesService';
 import CityGeographicFeatures from '@/interfaces/CityGeographicFeatures';
+import { sleep } from '@/utils/timeHelper';
 
 export default defineComponent({
   name: 'CityGeographicFeaturesView',
 
   components: {
     BrazilMunicipalitiesMap,
+    LoadingBars,
   },
 
   setup() {
@@ -87,10 +98,12 @@ export default defineComponent({
     const selectedCity = ref('')
     const selectedFeature = ref('')
     const isLoading = ref(false)
+    const isDetailsLoading = ref(false)
     const municipalitiesList = ref<CityGeographicFeatures[]>([])
 
     const loadData = async () => {
       isLoading.value = true
+      await sleep(500)
       try {
         const data = await fetchData()
         municipalitiesList.value = data
@@ -130,15 +143,22 @@ export default defineComponent({
       })
     }
 
-    const showFeatureDetails = (key: string) => {
-      console.log('key', key)
+    const showFeatureDetails = async (key: string) => {
       if(selectedFeature.value === key) {
         selectedFeature.value = ''
         return
       }
       selectedFeature.value = key
       // Scroll
+      await nextTick()
+      document.querySelector('.geo-features-details__heading')?.scrollIntoView({
+        block: 'start',
+        behavior: 'smooth'
+      });
       // Load
+      isDetailsLoading.value = true
+      await sleep(1500)
+      isDetailsLoading.value = false
       // Render
     }
 
@@ -151,6 +171,8 @@ export default defineComponent({
       selectedCity,
       selectedFeature,
       selectedFeatureLabel,
+      isLoading,
+      isDetailsLoading,
       svgLoaded: () => console.log('svgLoaded'),
       svgLoadError: () => console.log('svgLoadError'),
       cityClick: (code: string) => {
@@ -182,6 +204,7 @@ export default defineComponent({
 .geo-features__container {
   background-color: #e0e0f0;
   padding: 14px 10px;
+  position: relative;
 }
 
 .geo-features__labels {
@@ -244,10 +267,27 @@ export default defineComponent({
   display: flex;
   gap: 10px;
   justify-content: center;
+  padding: 4px 0px;
 }
 
 .geo-features-details__option {
   border: 1px solid black;
   padding: 4px;
+}
+
+.geo-features-details__graph {
+  border: 1px solid black;
+  height: 750px;
+  position: relative;
+}
+
+.geo-features-details__loading, .geo-features__loading {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(200, 200, 200, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
