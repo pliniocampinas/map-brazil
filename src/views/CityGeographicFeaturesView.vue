@@ -10,14 +10,19 @@
       >
       </BrazilMunicipalitiesMap>
       <div class="geo-features__labels">
-        <div class="geo-features__label"
+        <div class="geo-features__label">
+          <span class="geo-features__label__text">
+          Clique em um dos labels para ver detalhes
+          </span>
+        </div>
+        <div class="geo-features__label geo-features--hover"
           v-for="(feature, index) in displayedFeatures"
           :key="index"
         >
-          <span class="geo-features__label__text">
+          <span class="geo-features__label__text geo-features--hover">
           {{feature.label}}
           </span>
-          <span class="geo-features__label__box" :style="`background-color:${feature.color};`"></span>
+          <span class="geo-features__label__box blink" :style="`background-color:${feature.color};`"></span>
         </div>
       </div>
     </div>
@@ -146,9 +151,8 @@ export default defineComponent({
   position: absolute;
   right: 0;
   top: 0;
-  height: 100%;
   width: 180px;
-  padding: 28px 14px;
+  padding: 20px 10px 2px 2px;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -161,6 +165,13 @@ export default defineComponent({
   align-items: center;
   align-self: end;
   gap: 8px;
+  background-color: #e0e0f0;
+  cursor: pointer;
+}
+
+.geo-features__label:hover .geo-features--hover,
+.geo-features__label:hover .geo-features--hover {
+  opacity: 0.6 !important;
 }
 
 .geo-features__label__box {
@@ -168,6 +179,22 @@ export default defineComponent({
   width: 15px;
   height: 15px;
   display: inline-block;
+}
+
+.blink {
+  animation: blinker 6s linear infinite;
+}
+
+@keyframes blinker {
+  0% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 0.4;
+  }
 }
 
 .geo-features__map {
