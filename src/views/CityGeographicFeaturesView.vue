@@ -9,6 +9,17 @@
         @path-map-loaded="pathMapLoaded"
       >
       </BrazilMunicipalitiesMap>
+      <div class="geo-features__labels">
+        <div class="geo-features__label"
+          v-for="(feature, index) in displayedFeatures"
+          :key="index"
+        >
+          <span class="geo-features__label__text">
+          {{feature.label}}
+          </span>
+          <span class="geo-features__label__box" :style="`background-color:${feature.color};`"></span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -27,6 +38,28 @@ export default defineComponent({
   },
 
   setup() {
+    const displayedFeatures = [
+      {
+        label: 'MATOPIBA',
+        color: 'rgb(180, 180, 180)',
+      },
+      {
+        label: 'Amazônia Legal',
+        color: 'rgb(50, 172, 50)',
+      },
+      {
+        label: 'Semi-árido',
+        color: 'rgb(252, 172, 99)',
+      },
+      {
+        label: 'Defrontante ao mar',
+        color: 'rgb(50, 50, 180)',
+      },
+      {
+        label: 'Outros',
+        color: 'rgb(0, 122, 97)',
+      },
+    ]
     const selectedCity = ref('')
     const isLoading = ref(false)
     const municipalitiesList = ref<CityGeographicFeatures[]>([])
@@ -44,12 +77,12 @@ export default defineComponent({
 
     const getFeatureColor = (city: CityGeographicFeatures): string => {
       // TODO: Handle intersections with matopiba legal amazon and semiarid
-      if(city.isMatopiba) {
-        return 'rgb(180, 180, 180)'
-      }
-
       if(city.isSeaFront) {
         return 'rgb(50, 50, 180)'
+      }
+
+      if(city.isMatopiba) {
+        return 'rgb(180, 180, 180)'
       }
 
       if(city.isSemiArid) {
@@ -73,6 +106,7 @@ export default defineComponent({
     }
 
     return {
+      displayedFeatures,
       selectedCity,
       svgLoaded: () => console.log('svgLoaded'),
       svgLoadError: () => console.log('svgLoadError'),
@@ -102,7 +136,38 @@ export default defineComponent({
 }
 
 .geo-features__container {
-  background-color: #f9f9f9;
+  background-color: #e0e0f0;
+  padding: 14px 10px;
+}
+
+.geo-features__labels {
+  background-color: transparent;
+  box-sizing: border-box;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 180px;
+  padding: 28px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.geo-features__label {
+  font-weight: 700;
+  font-size: small;
+  display: flex;
+  align-items: center;
+  align-self: end;
+  gap: 8px;
+}
+
+.geo-features__label__box {
+  border: 1px solid black;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
 }
 
 .geo-features__map {
