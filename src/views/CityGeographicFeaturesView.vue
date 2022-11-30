@@ -42,13 +42,7 @@
           <div class="geo-features-details__loading" v-if="isDetailsLoading">
             <LoadingBars/>
           </div>
-          <div class="" v-else-if="selectedFeatureStats">
-            {{ selectedFeatureStats.featureName }} -
-            {{ selectedFeatureStats.nationalAverage }} -
-            {{ selectedFeatureStats.featureGdpPerCapitaBrlAverage }} -
-            {{ selectedFeatureStats.featureTotalGdp1000BrlGrowthPercentAverage }} -
-            {{ selectedFeatureStats.featurePopulationGrowthPercentAverage }}
-          </div>
+          <canvas v-show="selectedFeatureStats" id="myChart"></canvas>
         </div>
       </template>
       <div v-else class="geo-features-details__options">
@@ -60,6 +54,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, nextTick, ref } from 'vue';
+import { Chart, ChartItem, registerables } from 'chart.js';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import LoadingBars from '@/components/LoadingBars.vue';
 import { fetchData } from '@/services/GetCityGeographicFeaturesService';
@@ -77,6 +72,7 @@ export default defineComponent({
   },
 
   setup() {
+    Chart.register(...registerables)
     const displayedFeatures = [
       {
         label: 'MATOPIBA',
@@ -153,6 +149,34 @@ export default defineComponent({
       })
     }
 
+    const drawChart = (stat: string, featureLabel: string) => {
+      // Map other stats other then GdpPerCapita
+      const ctx = document.getElementById('myChart');
+
+      // Handle redraw
+      new Chart(ctx as ChartItem, {
+        type: 'bar',
+        data: {
+          labels: ['Média Nacional', featureLabel],
+          datasets: [{
+            label: 'PIB per Capita',
+            data: [
+              selectedFeatureStats.value?.nationalAverage??0, 
+              selectedFeatureStats.value?.featureGdpPerCapitaBrlAverage??0
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
     const showFeatureDetails = async (key: string) => {
       if(selectedFeature.value === key) {
         selectedFeature.value = ''
@@ -171,6 +195,7 @@ export default defineComponent({
       selectedFeatureStats.value = await fetchStatsData(selectedFeature.value)
       isDetailsLoading.value = false
       // Render
+      drawChart('gdp-per-capita', selectedFeatureLabel.value)
     }
 
     const selectedFeatureLabel = computed(() => {
