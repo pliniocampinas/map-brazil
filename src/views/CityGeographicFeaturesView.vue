@@ -42,6 +42,13 @@
           <div class="geo-features-details__loading" v-if="isDetailsLoading">
             <LoadingBars/>
           </div>
+          <div class="" v-else-if="selectedFeatureStats">
+            {{ selectedFeatureStats.featureName }} -
+            {{ selectedFeatureStats.nationalAverage }} -
+            {{ selectedFeatureStats.featureGdpPerCapitaBrlAverage }} -
+            {{ selectedFeatureStats.featureTotalGdp1000BrlGrowthPercentAverage }} -
+            {{ selectedFeatureStats.featurePopulationGrowthPercentAverage }}
+          </div>
         </div>
       </template>
       <div v-else class="geo-features-details__options">
@@ -56,8 +63,10 @@ import { computed, defineComponent, nextTick, ref } from 'vue';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import LoadingBars from '@/components/LoadingBars.vue';
 import { fetchData } from '@/services/GetCityGeographicFeaturesService';
+import { fetchData as fetchStatsData } from '@/services/GetGeographicFeatureStatsService';
 import CityGeographicFeatures from '@/interfaces/CityGeographicFeatures';
 import { sleep } from '@/utils/timeHelper';
+import GeographicFeatureStats from '@/interfaces/GeographicFeatureStats';
 
 export default defineComponent({
   name: 'CityGeographicFeaturesView',
@@ -100,6 +109,7 @@ export default defineComponent({
     const isLoading = ref(false)
     const isDetailsLoading = ref(false)
     const municipalitiesList = ref<CityGeographicFeatures[]>([])
+    const selectedFeatureStats = ref<GeographicFeatureStats>()
 
     const loadData = async () => {
       isLoading.value = true
@@ -157,7 +167,8 @@ export default defineComponent({
       });
       // Load
       isDetailsLoading.value = true
-      await sleep(1500)
+      await sleep(500)
+      selectedFeatureStats.value = await fetchStatsData(selectedFeature.value)
       isDetailsLoading.value = false
       // Render
     }
@@ -171,6 +182,7 @@ export default defineComponent({
       selectedCity,
       selectedFeature,
       selectedFeatureLabel,
+      selectedFeatureStats,
       isLoading,
       isDetailsLoading,
       svgLoaded: () => console.log('svgLoaded'),
