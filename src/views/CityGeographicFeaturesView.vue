@@ -38,11 +38,13 @@
           <div class="geo-features-details__option">Crescimento PIB</div>
           <div class="geo-features-details__option">Crescimento Pop.</div>
         </div>
-        <div class="geo-features-details__graph">
+        <div class="geo-features-details__graph" >
           <div class="geo-features-details__loading" v-if="isDetailsLoading">
             <LoadingBars/>
           </div>
-          <canvas v-show="selectedFeatureStats" id="myChart"></canvas>
+          <canvas v-if="selectedFeatureStats && !isDetailsLoading" id="gdp-per-capita-chart"></canvas>
+          <canvas v-if="selectedFeatureStats && !isDetailsLoading" id="gdp-growth-chart"></canvas>
+          <canvas v-if="selectedFeatureStats && !isDetailsLoading" id="pop-growth-chart"></canvas>
         </div>
       </template>
       <div v-else class="geo-features-details__options">
@@ -53,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, ref } from 'vue';
+import { computed, defineComponent, nextTick, Ref, ref } from 'vue';
 import { Chart, ChartItem, registerables } from 'chart.js';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import LoadingBars from '@/components/LoadingBars.vue';
@@ -72,7 +74,6 @@ export default defineComponent({
   },
 
   setup() {
-    Chart.register(...registerables)
     const displayedFeatures = [
       {
         label: 'MATOPIBA',
@@ -106,6 +107,10 @@ export default defineComponent({
     const isDetailsLoading = ref(false)
     const municipalitiesList = ref<CityGeographicFeatures[]>([])
     const selectedFeatureStats = ref<GeographicFeatureStats>()
+    Chart.register(...registerables)
+    const gdpPerCapitaChart = ref<Chart>()
+    const gdpGrowthChart = ref<Chart>()
+    const popGrowthChart = ref<Chart>()
 
     const loadData = async () => {
       isLoading.value = true
@@ -149,21 +154,20 @@ export default defineComponent({
       })
     }
 
-    const drawChart = (stat: string, featureLabel: string) => {
-      // Map other stats other then GdpPerCapita
-      const ctx = document.getElementById('myChart');
+    const drawChart = (chartRef: Ref<Chart>, featureLabel: string, dataLabel: string, canvasId: string, charData: number[]) => {
+      if(chartRef.value) {
+        chartRef.value.destroy()
+      }
 
-      // Handle redraw
-      // Draw 3 small charts per stat or 1 chart per stat at a time? 
-      new Chart(ctx as ChartItem, {
+      const ctx = document.getElementById(canvasId)
+      chartRef.value = new Chart(ctx as ChartItem, {
         type: 'bar',
         data: {
           labels: ['Média Nacional', featureLabel],
           datasets: [{
-            label: 'PIB per Capita',
+            label: dataLabel,
             data: [
-              selectedFeatureStats.value?.nationalGdpPerCapitaBrlAverage??0, 
-              selectedFeatureStats.value?.featureGdpPerCapitaBrlAverage??0
+              ...charData
             ],
             borderWidth: 1
           }]
@@ -195,8 +199,21 @@ export default defineComponent({
       await sleep(500)
       selectedFeatureStats.value = await fetchStatsData(selectedFeature.value)
       isDetailsLoading.value = false
+      await nextTick()
       // Render
-      drawChart('gdp-per-capita', selectedFeatureLabel.value)
+      
+      drawChart(gdpPerCapitaChart as Ref<Chart>, selectedFeatureLabel.value, 
+        'Pib per Capita', 'gdp-per-capita-chart', 
+        [selectedFeatureStats.value?.nationalGdpPerCapitaBrlAverage??0, 
+          selectedFeatureStats.value?.featureGdpPerCapitaBrlAverage??0])
+      drawChart(gdpGrowthChart as Ref<Chart>, selectedFeatureLabel.value, 
+        'Crescimendo PIB', 'gdp-growth-chart', 
+        [selectedFeatureStats.value?.nationalTotalGdpBrlGrowthPercentAverage??0, 
+          selectedFeatureStats.value?.featureTotalGdpBrlGrowthPercentAverage??0])
+      drawChart(popGrowthChart as Ref<Chart>, selectedFeatureLabel.value, 
+        'Crescimento Pop', 'pop-growth-chart', 
+        [selectedFeatureStats.value?.nationalPopulationGrowthPercentAverage??0, 
+          selectedFeatureStats.value?.featurePopulationGrowthPercentAverage??0])
     }
 
     const selectedFeatureLabel = computed(() => {
@@ -317,6 +334,9 @@ export default defineComponent({
   border: 1px solid black;
   height: 750px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
 }
 
 .geo-features-details__loading, .geo-features__loading {
