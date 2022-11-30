@@ -154,6 +154,7 @@ export default defineComponent({
       const ctx = document.getElementById('myChart');
 
       // Handle redraw
+      // Draw 3 small charts per stat or 1 chart per stat at a time? 
       new Chart(ctx as ChartItem, {
         type: 'bar',
         data: {
@@ -161,7 +162,7 @@ export default defineComponent({
           datasets: [{
             label: 'PIB per Capita',
             data: [
-              selectedFeatureStats.value?.nationalAverage??0, 
+              selectedFeatureStats.value?.nationalGdpPerCapitaBrlAverage??0, 
               selectedFeatureStats.value?.featureGdpPerCapitaBrlAverage??0
             ],
             borderWidth: 1

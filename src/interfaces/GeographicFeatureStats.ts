@@ -1,7 +1,9 @@
 export default interface GeographicFeatureStats {
   featureName: string
-  nationalAverage: number
+  nationalGdpPerCapitaBrlAverage: number
+  nationalTotalGdpBrlGrowthPercentAverage: number
+  nationalPopulationGrowthPercentAverage: number
   featureGdpPerCapitaBrlAverage: number
-  featureTotalGdp1000BrlGrowthPercentAverage: number
+  featureTotalGdpBrlGrowthPercentAverage: number
   featurePopulationGrowthPercentAverage: number
 }
