@@ -38,15 +38,15 @@
             <LoadingBars/>
           </div>
           <div v-if="selectedFeatureStats && !isDetailsLoading">
-            <h4 class="geo-features-details__option">PIB per Capita</h4>
+            <h3 class="geo-features-details__option">PIB per Capita</h3>
             <canvas id="gdp-per-capita-chart"></canvas>
           </div>
           <div v-if="selectedFeatureStats && !isDetailsLoading">
-            <h4 class="geo-features-details__option">% Crescimento PIB</h4>
+            <h3 class="geo-features-details__option">% Crescimento PIB</h3>
             <canvas id="gdp-growth-chart"></canvas>
           </div>
           <div v-if="selectedFeatureStats && !isDetailsLoading">
-            <h4 class="geo-features-details__option">% Crescimento PIB</h4>
+            <h3 class="geo-features-details__option">% Crescimento Populacional.</h3>
             <canvas id="pop-growth-chart"></canvas>
           </div>
         </div>
@@ -129,7 +129,6 @@ export default defineComponent({
     }
 
     const getFeatureColor = (city: CityGeographicFeatures): string => {
-      // TODO: Handle intersections with matopiba legal amazon and semiarid
       if(city.isSeaFront) {
         return 'rgb(50, 50, 180)'
       }
