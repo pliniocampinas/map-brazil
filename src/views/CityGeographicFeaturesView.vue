@@ -33,21 +33,25 @@
     <div class="geo-features-details__container">
       <h1 class="geo-features-details__heading">Detalhes {{ selectedFeatureLabel }}</h1>
       <template v-if="selectedFeatureLabel">
-        <div class="geo-features-details__options">
-          <div class="geo-features-details__option">PIB per Capita</div>
-          <div class="geo-features-details__option">Crescimento PIB</div>
-          <div class="geo-features-details__option">Crescimento Pop.</div>
-        </div>
         <div class="geo-features-details__graph" >
           <div class="geo-features-details__loading" v-if="isDetailsLoading">
             <LoadingBars/>
           </div>
-          <canvas v-if="selectedFeatureStats && !isDetailsLoading" id="gdp-per-capita-chart"></canvas>
-          <canvas v-if="selectedFeatureStats && !isDetailsLoading" id="gdp-growth-chart"></canvas>
-          <canvas v-if="selectedFeatureStats && !isDetailsLoading" id="pop-growth-chart"></canvas>
+          <div v-if="selectedFeatureStats && !isDetailsLoading">
+            <h4 class="geo-features-details__option">PIB per Capita</h4>
+            <canvas id="gdp-per-capita-chart"></canvas>
+          </div>
+          <div v-if="selectedFeatureStats && !isDetailsLoading">
+            <h4 class="geo-features-details__option">% Crescimento PIB</h4>
+            <canvas id="gdp-growth-chart"></canvas>
+          </div>
+          <div v-if="selectedFeatureStats && !isDetailsLoading">
+            <h4 class="geo-features-details__option">% Crescimento PIB</h4>
+            <canvas id="pop-growth-chart"></canvas>
+          </div>
         </div>
       </template>
-      <div v-else class="geo-features-details__options">
+      <div v-else>
         ---
       </div>
     </div>
@@ -167,7 +171,6 @@ export default defineComponent({
           labels: ['Média Nacional', featureLabel],
           datasets: [{
             backgroundColor: color,
-            label: dataLabel,
             data: [
               ...charData
             ],
@@ -175,6 +178,11 @@ export default defineComponent({
           }]
         },
         options: {
+          plugins: {
+            legend: {
+              display: false
+            },
+          },
           scales: {
             y: {
               beginAtZero: true
@@ -320,25 +328,17 @@ export default defineComponent({
   height: 500px;
 }
 
-.geo-features-details__options {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  padding: 4px 0px;
-}
-
 .geo-features-details__option {
   border: 1px solid black;
   padding: 4px;
 }
 
 .geo-features-details__graph {
-  border: 1px solid black;
-  height: 750px;
+  min-height: 800px;
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 50px;
+  gap: 20px;
 }
 
 .geo-features-details__loading, .geo-features__loading {
