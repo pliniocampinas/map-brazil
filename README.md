@@ -5,7 +5,7 @@
 <img src="https://github.com/pliniocampinas/map-brazil/blob/main/printed-examples/CitiesGdpMapPrint.png" alt="Print Mapa de cidades Pib per Capita" style="width:300px;"/>
 </span>
 <span>
-<img src="https://github.com/pliniocampinas/map-brazil/blob/main/printed-examples/GeoFeaturesMapZoomInPrint.png" alt="Print Mapa de cidades Pib per Capita" style="width:300px;"/>
+<img src="https://github.com/pliniocampinas/map-brazil/blob/main/printed-examples/CitiesGdpMapZoomInPrint.png" alt="Print Mapa de cidades Pib per Capita" style="width:300px;"/>
 </span>
 <span>
 <img align="top" src="https://github.com/pliniocampinas/map-brazil/blob/main/printed-examples/GeoFeaturesMapPrint.png" alt="Print Mapa de cidades Pib per Capita" style="width:300px;"/>
