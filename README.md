@@ -1,6 +1,6 @@
 # map-brazil
 
-## Examples
+## Exemplos
 <span>
 <img src="https://github.com/pliniocampinas/map-brazil/blob/main/printed-examples/CitiesGdpMapPrint.png" alt="Print Mapa de cidades Pib per Capita" style="width:300px;"/>
 </span>
@@ -11,6 +11,18 @@
 <img align="top" src="https://github.com/pliniocampinas/map-brazil/blob/main/printed-examples/GeoFeaturesMapPrint.png" alt="Print Mapa de cidades Pib per Capita" style="width:300px;"/>
 </span>
 
+## Road Map
+
+
+- [x] Página básica de PIB dos estados. 
+- [x] Página de PIB dos municípios. 
+- [x] Página de mapa de regiões geográficas. 
+- [ ] Renderizar imagens como fallback para rodar app sem API e banco de dados. 
+- [ ] (Optional) Alternativamente usar arquivos .csv como fallback
+- [ ] Página capitais e regiões metropolitanas
+- [ ] Página dsitancia do equador
+- [ ] Melhorar pagina de mapa dos estados
+- [ ] Página de macro-regiões
 
 ## Run 
 
