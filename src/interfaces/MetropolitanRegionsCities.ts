@@ -3,5 +3,5 @@ export default interface MetropolitanRegionsCities {
   cityName: string
   stateAcronym: string
   isMetropolitanRegion: boolean
-  MetropolitanRegionName: boolean
+  metropolitanRegionName: string
 }

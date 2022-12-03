@@ -37,6 +37,7 @@
 </template>
 
 <script lang="ts">
+import * as d3 from "d3";
 import { defineComponent, ref } from 'vue';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import LoadingBars from '@/components/LoadingBars.vue';
@@ -69,12 +70,19 @@ export default defineComponent({
     const selectedMetropolitanRegion = ref('')
     const isLoading = ref(false)
     const municipalitiesList = ref<MetropolitanRegionsCities[]>([])
+    const metropolitanRegionColorMap = ref<{color: string, name: string}[]>([])
 
     const loadData = async () => {
       isLoading.value = true
       await sleep(500)
       try {
         const data = await fetchData()
+        const uniqueMetropolitanRegionsSet = new Set<string>()
+        for (const city of data) {
+          uniqueMetropolitanRegionsSet.add(city.metropolitanRegionName)
+        }
+        const uniqueMetropolitanRegions = Array.from(uniqueMetropolitanRegionsSet)
+        metropolitanRegionColorMap.value = getMetropolitanRegionColorMap(uniqueMetropolitanRegions)
         municipalitiesList.value = data
         isLoading.value = false
       } catch(err) {
@@ -82,10 +90,20 @@ export default defineComponent({
       }
     }
 
-    const getFeatureColor = (city: MetropolitanRegionsCities): string => {
-      // TODO: get a proper color for each metropolitan region with D3
+    const getMetropolitanRegionColorMap = (metropolitanRegions: string[]) => {
+      return metropolitanRegions.map((regionName, index) => {
+        var remainder = index%10
+        return {
+          name: regionName,
+          color: d3.schemeCategory10[remainder]
+        }
+      })
+    }
+
+    const getColor = (city: MetropolitanRegionsCities): string => {
       if(city.isMetropolitanRegion) {
-        return 'rgb(50, 50, 180)'
+        const color = metropolitanRegionColorMap.value.find(region => region.name===city.metropolitanRegionName)?.color?? ''
+        return color
       }
 
       return 'rgb(0, 122, 97)';
@@ -95,7 +113,7 @@ export default defineComponent({
       municipalitiesList.value.forEach(d => {
         const pathElement = pathElementsMap[d.cityId]
         if(pathElement) {
-          pathElement.setAttribute("fill", getFeatureColor(d))
+          pathElement.setAttribute("fill", getColor(d))
         }
       })
     }
