@@ -30,6 +30,10 @@ const navLinks = [
   {
     text: 'Mapa características geográficas',
     to: '/maps/geo-features',
+  }, 
+  {
+    text: 'Mapa regiões metropolitanas',
+    to: '/maps/metropolitan-regions',
   }
 ]
 

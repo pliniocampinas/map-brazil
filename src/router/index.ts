@@ -27,6 +27,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'CityGeographicFeatures',
     component: () => import(/* webpackChunkName: "geo-features-view" */ '../views/CityGeographicFeaturesView.vue')
   },
+  {
+    path: '/maps/metropolitan-regions',
+    name: 'MetropolitanRegions',
+    component: () => import(/* webpackChunkName: "metropolitan-regions-view" */ '../views/MetropolitanRegionsView.vue')
+  },
 ]
 
 const router = createRouter({
