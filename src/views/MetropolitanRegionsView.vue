@@ -92,6 +92,8 @@ export default defineComponent({
 
     const getMetropolitanRegionColorMap = (metropolitanRegions: string[]) => {
       return metropolitanRegions.map((regionName, index) => {
+        // schemeCategory10 holds only 10 colors but there are 83 regions
+        // with remainder we get repeated colors.
         var remainder = index%10
         return {
           name: regionName,
