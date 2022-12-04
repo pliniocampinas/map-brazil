@@ -21,7 +21,8 @@
       </div>
     </div>
     <div class="metropolitan-regions-details__container">
-      <h1 class="metropolitan-regions-details__heading">Detalhes {{ selectedMetropolitanRegion }}</h1>
+      <h1 class="metropolitan-regions-details__heading">Detalhes</h1>
+      <h3 class="metropolitan-regions-details__heading">{{ selectedMetropolitanRegion }}</h3>
     </div>
   </div>
 </template>
@@ -109,16 +110,16 @@ export default defineComponent({
       cityClick: (code: string) => {
         if(selectedCity.value == code) {
           selectedCity.value = ''
+          selectedMetropolitanRegion.value = ''
           return
         }
         selectedCity.value = code;
 
         const city = municipalitiesList.value.find(m => m.cityId+''===code)
         if(!city) {
-          console.log('city not found, something is bad')
+          console.warn('city not found, something terrible happened')
         }
-        const region = uniqueMetropolitanRegions.value.find(region => region===city?.metropolitanRegionName)
-        selectedMetropolitanRegion.value = region??''
+        selectedMetropolitanRegion.value = city?.metropolitanRegionName??''
       },
       pathMapLoaded: (pathMap: { [code: string] : Element | null; }) => {
         loadData().then(() => colorizePaths(pathMap))
