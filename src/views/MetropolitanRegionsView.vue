@@ -15,18 +15,8 @@
       <div class="metropolitan-regions__labels">
         <div class="metropolitan-regions__label">
           <span class="metropolitan-regions__label__text">
-          Clique em um dos labels para ver detalhes
+          Clique em uma região metropolitana para ver detalhes
           </span>
-        </div>
-        <div class="metropolitan-regions__label metropolitan-regions--hover"
-          v-for="(feature, index) in displayedFeatures"
-          :key="index"
-          @click="showFeatureDetails(feature.key)"
-        >
-          <span class="metropolitan-regions__label__text metropolitan-regions--hover">
-          {{feature.label}}
-          </span>
-          <span class="metropolitan-regions__label__box blink" :style="`background-color:${feature.color};`"></span>
         </div>
       </div>
     </div>
@@ -54,22 +44,11 @@ export default defineComponent({
   },
 
   setup() {
-    const displayedFeatures = [
-      {
-        label: 'Região metropolitana',
-        key: 'metropolitan',
-        color: 'rgb(50, 50, 180)',
-      },
-      {
-        label: 'Não metropolitana',
-        key: 'non-metropolitan',
-        color: 'rgb(50, 172, 50)',
-      },
-    ]
     const selectedCity = ref('')
     const selectedMetropolitanRegion = ref('')
     const isLoading = ref(false)
     const municipalitiesList = ref<MetropolitanRegionsCities[]>([])
+    const uniqueMetropolitanRegions = ref<string[]>([])
     const metropolitanRegionColorMap = ref<{color: string, name: string}[]>([])
 
     const loadData = async () => {
@@ -81,8 +60,8 @@ export default defineComponent({
         for (const city of data) {
           uniqueMetropolitanRegionsSet.add(city.metropolitanRegionName)
         }
-        const uniqueMetropolitanRegions = Array.from(uniqueMetropolitanRegionsSet)
-        metropolitanRegionColorMap.value = getMetropolitanRegionColorMap(uniqueMetropolitanRegions)
+        uniqueMetropolitanRegions.value = Array.from(uniqueMetropolitanRegionsSet)
+        metropolitanRegionColorMap.value = getMetropolitanRegionColorMap(uniqueMetropolitanRegions.value)
         municipalitiesList.value = data
         isLoading.value = false
       } catch(err) {
@@ -121,7 +100,6 @@ export default defineComponent({
     }
 
     return {
-      displayedFeatures,
       selectedCity,
       selectedMetropolitanRegion,
       isLoading,
@@ -134,6 +112,13 @@ export default defineComponent({
           return
         }
         selectedCity.value = code;
+
+        const city = municipalitiesList.value.find(m => m.cityId+''===code)
+        if(!city) {
+          console.log('city not found, something is bad')
+        }
+        const region = uniqueMetropolitanRegions.value.find(region => region===city?.metropolitanRegionName)
+        selectedMetropolitanRegion.value = region??''
       },
       pathMapLoaded: (pathMap: { [code: string] : Element | null; }) => {
         loadData().then(() => colorizePaths(pathMap))
@@ -179,20 +164,9 @@ export default defineComponent({
   align-items: center;
   align-self: end;
   gap: 8px;
-  background-color: #e0e0f0;
+  background-color: rgba(200, 200, 200, 0.4);
+  border: 1px solid rgb(200, 200, 200);
   cursor: pointer;
-}
-
-.metropolitan-regions__label:hover .metropolitan-regions--hover,
-.metropolitan-regions__label:hover .metropolitan-regions--hover {
-  opacity: 0.6 !important;
-}
-
-.metropolitan-regions__label__box {
-  border: 1px solid black;
-  width: 15px;
-  height: 15px;
-  display: inline-block;
 }
 
 .blink {
