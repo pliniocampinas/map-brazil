@@ -50,6 +50,7 @@ export default defineComponent({
           continue
         }
         pathElement.addEventListener('click', () => emit('city-click', code))
+        pathElement.addEventListener('touchend', () => emit('city-click', code))
         pathElementsMap[code] = pathElement
       }
       emit('path-map-loaded', pathElementsMap)
