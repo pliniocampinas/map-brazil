@@ -1,11 +1,11 @@
 interface MetropolitanRegionDetails {
-  MetropolitanRegionName: string
-  StateAcronym: string
-  Population: number
-  TotalGdp1000Brl: number
-  GdpPerCapitaBrlAverage: number
-  TotalGdpBrlGrowthPercentAverage: number
-  PopulationGrowthPercentAverage: number
+  metropolitanRegionName: string
+  stateAcronym: string
+  oopulation: number
+  totalGdp1000Brl: number
+  gdpPerCapitaBrlAverage: number
+  totalGdpBrlGrowthPercentAverage: number
+  populationGrowthPercentAverage: number
 }
 
 export default interface MetropolitanRegionsDetails {

@@ -157,7 +157,7 @@ export default defineComponent({
       })
     }
 
-    const drawChart = (chartRef: Ref<Chart>, featureLabel: string, dataLabel: string, 
+    const drawChart = (chartRef: Ref<Chart>, featureLabel: string, 
       canvasId: string, charData: number[], color: string) => {
       if(chartRef.value) {
         chartRef.value.destroy()
@@ -212,15 +212,15 @@ export default defineComponent({
       // Render
       
       drawChart(gdpPerCapitaChart as Ref<Chart>, selectedFeatureLabel.value, 
-        'Pib per Capita', 'gdp-per-capita-chart', 
+        'gdp-per-capita-chart', 
         [selectedFeatureStats.value?.nationalGdpPerCapitaBrlAverage??0, 
           selectedFeatureStats.value?.featureGdpPerCapitaBrlAverage??0], 'red')
       drawChart(gdpGrowthChart as Ref<Chart>, selectedFeatureLabel.value, 
-        'Crescimendo PIB', 'gdp-growth-chart', 
+       'gdp-growth-chart', 
         [selectedFeatureStats.value?.nationalTotalGdpBrlGrowthPercentAverage??0, 
           selectedFeatureStats.value?.featureTotalGdpBrlGrowthPercentAverage??0], 'green')
       drawChart(popGrowthChart as Ref<Chart>, selectedFeatureLabel.value, 
-        'Crescimento Pop', 'pop-growth-chart', 
+       'pop-growth-chart', 
         [selectedFeatureStats.value?.nationalPopulationGrowthPercentAverage??0, 
           selectedFeatureStats.value?.featurePopulationGrowthPercentAverage??0], 'blue')
     }

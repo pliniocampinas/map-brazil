@@ -23,18 +23,39 @@
     <div class="metropolitan-regions-details__container">
       <h1 class="metropolitan-regions-details__heading">Detalhes</h1>
       <h3 class="metropolitan-regions-details__heading">{{ selectedMetropolitanRegion }}</h3>
+      <div class="metropolitan-regions-details__graph" >
+        <div class="metropolitan-regions-details__loading" v-if="isDetailsLoading">
+          <LoadingBars/>
+        </div>
+        <div v-if="!isDetailsLoading">
+          <h3 class="metropolitan-regions-details__option">PIB per Capita</h3>
+          <canvas id="gdp-per-capita-chart"></canvas>
+        </div>
+        <div v-if="!isDetailsLoading">
+          <h3 class="metropolitan-regions-details__option">% Crescimento PIB</h3>
+          <canvas id="gdp-growth-chart"></canvas>
+        </div>
+        <div v-if="!isDetailsLoading">
+          <h3 class="metropolitan-regions-details__option">% Crescimento Populacional.</h3>
+          <canvas id="pop-growth-chart"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import * as d3 from "d3";
-import { defineComponent, ref } from 'vue';
+import { defineComponent, nextTick, Ref, ref } from 'vue';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import LoadingBars from '@/components/LoadingBars.vue';
 import { fetchData } from '@/services/GetMetropolitanRegionsCities';
+import { fetchData as fetchDetails } from '@/services/GetMetropolitanRegionsDetailsService';
 import { sleep } from '@/utils/timeHelper';
 import MetropolitanRegionsCities from '@/interfaces/MetropolitanRegionsCities';
+import MetropolitanRegionsDetails from "@/interfaces/MetropolitanRegionsDetails";
+import { Chart, ChartItem, registerables } from "chart.js";
+import ChartAnnotationsPlugin from 'chartjs-plugin-annotation';
 
 export default defineComponent({
   name: 'MetropolitanRegionsView',
@@ -48,10 +69,17 @@ export default defineComponent({
     const selectedCity = ref('')
     const selectedMetropolitanRegion = ref('')
     const isLoading = ref(false)
+    const isDetailsLoading = ref(false)
     const municipalitiesList = ref<MetropolitanRegionsCities[]>([])
+    const metropolitanRegionsDetails = ref<MetropolitanRegionsDetails>()
     const uniqueMetropolitanRegions = ref<string[]>([])
     const metropolitanRegionColorMap = ref<{color: string, name: string}[]>([])
-
+    Chart.register(...registerables)
+    Chart.register(ChartAnnotationsPlugin);
+    const gdpPerCapitaChart = ref<Chart>()
+    const gdpGrowthChart = ref<Chart>()
+    const popGrowthChart = ref<Chart>()
+    
     const loadData = async () => {
       isLoading.value = true
       await sleep(500)
@@ -100,10 +128,86 @@ export default defineComponent({
       })
     }
 
+    const drawChart = (chartRef: Ref<Chart>, labels: string[], 
+      canvasId: string, charData: number[], color: string) => {
+      if(chartRef.value) {
+        chartRef.value.destroy()
+      }
+
+      console.log('charData', charData)
+
+      const ctx = document.getElementById(canvasId)
+      chartRef.value = new Chart(ctx as ChartItem, {
+        type: 'bar',
+        data: {
+          labels: [...labels],
+          datasets: [{
+            backgroundColor: color,
+            data: [
+              ...charData
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false
+            },
+            // annotation: {
+            //   annotations: [
+            //     {
+            //       type: 'line',
+            //       scaleID: 'y-0',
+            //       value: 20,
+            //       label: {
+            //         content: 'My Horizontal Line',
+            //       }
+            //     }
+            //   ]
+            // }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          },
+        }
+      });
+    }
+    
+    const loadDetails = async () => {
+      // Load
+      isDetailsLoading.value = true
+      await sleep(500)
+      metropolitanRegionsDetails.value = await fetchDetails()
+      isDetailsLoading.value = false
+      await nextTick()
+      console.log('metropolitanRegionsDetails', metropolitanRegionsDetails.value.metropolitanRegions.length)
+      // Render
+
+      console.log('metropolitanRegionsDetails', metropolitanRegionsDetails.value.metropolitanRegions.slice(1,10))
+      
+      drawChart(gdpPerCapitaChart as Ref<Chart>, 
+        metropolitanRegionsDetails.value.metropolitanRegions.slice(1,10).map(r => r.metropolitanRegionName), 
+        'gdp-per-capita-chart', 
+        metropolitanRegionsDetails.value.metropolitanRegions.slice(1,10).map(r => r.gdpPerCapitaBrlAverage), 
+        'red')
+      // drawChart(gdpGrowthChart as Ref<Chart>, selectedFeatureLabel.value, 
+      //   'Crescimendo PIB', 'gdp-growth-chart', 
+      //   [selectedFeatureStats.value?.nationalTotalGdpBrlGrowthPercentAverage??0, 
+      //     selectedFeatureStats.value?.featureTotalGdpBrlGrowthPercentAverage??0], 'green')
+      // drawChart(popGrowthChart as Ref<Chart>, selectedFeatureLabel.value, 
+      //   'Crescimento Pop', 'pop-growth-chart', 
+      //   [selectedFeatureStats.value?.nationalPopulationGrowthPercentAverage??0, 
+      //     selectedFeatureStats.value?.featurePopulationGrowthPercentAverage??0], 'blue')
+    }
+
     return {
       selectedCity,
       selectedMetropolitanRegion,
       isLoading,
+      isDetailsLoading,
       svgLoaded: () => console.log('svgLoaded'),
       svgLoadError: () => console.log('svgLoadError'),
       showFeatureDetails: () => console.log('showFeatureDetails'),
@@ -122,7 +226,9 @@ export default defineComponent({
         selectedMetropolitanRegion.value = city?.metropolitanRegionName??''
       },
       pathMapLoaded: (pathMap: { [code: string] : Element | null; }) => {
-        loadData().then(() => colorizePaths(pathMap))
+        loadData()
+          .then(() => colorizePaths(pathMap))
+          .then(loadDetails)
       },
     }
   }
@@ -211,5 +317,10 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.metropolitan-regions-details__option {
+  border: 1px solid black;
+  padding: 4px;
 }
 </style>
