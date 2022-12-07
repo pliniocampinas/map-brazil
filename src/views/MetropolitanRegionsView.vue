@@ -128,13 +128,17 @@ export default defineComponent({
       })
     }
 
-    const drawChart = (chartRef: Ref<Chart>, labels: string[], 
-      canvasId: string, charData: number[], color: string) => {
+    const drawChart = (
+        chartRef: Ref<Chart>, 
+        nationalAverage: number,
+        labels: string[], 
+        charData: number[], 
+        canvasId: string,  
+        color: string
+      ) => {
       if(chartRef.value) {
         chartRef.value.destroy()
       }
-
-      console.log('charData', charData)
 
       const ctx = document.getElementById(canvasId)
       chartRef.value = new Chart(ctx as ChartItem, {
@@ -154,19 +158,17 @@ export default defineComponent({
             legend: {
               display: false
             },
-            // annotation: {
-            //   annotations: [
-            //     {
-            //       type: 'line',
-            //       scaleID: 'y-0',
-            //       value: 20,
-            //       label: {
-            //         content: 'My Horizontal Line',
-            //       }
-            //     }
-            //   ]
-            // }
+            annotation: {
+              annotations: [
+                {
+                  type: 'line',
+                  scaleID: 'x',
+                  value: nationalAverage,
+                }
+              ]
+            }
           },
+          indexAxis: 'y',
           scales: {
             y: {
               beginAtZero: true
@@ -183,24 +185,51 @@ export default defineComponent({
       metropolitanRegionsDetails.value = await fetchDetails()
       isDetailsLoading.value = false
       await nextTick()
-      console.log('metropolitanRegionsDetails', metropolitanRegionsDetails.value.metropolitanRegions.length)
-      // Render
 
-      console.log('metropolitanRegionsDetails', metropolitanRegionsDetails.value.metropolitanRegions.slice(1,10))
-      
-      drawChart(gdpPerCapitaChart as Ref<Chart>, 
-        metropolitanRegionsDetails.value.metropolitanRegions.slice(1,10).map(r => r.metropolitanRegionName), 
+      // Render Gdp per Capita Chart
+      const gdpPerCapitaChartData = metropolitanRegionsDetails.value.
+        metropolitanRegions.map(r => ({
+          label: r.metropolitanRegionName,
+          value: r.gdpPerCapitaBrlAverage
+        })).sort((r1, r2) => r1.value > r2.value? -1: 1)
+        .slice(0, 5)
+
+      drawChart(gdpPerCapitaChart as Ref<Chart>,
+        metropolitanRegionsDetails.value.nationalGdpPerCapitaBrlAverage,
+        gdpPerCapitaChartData.map(r => r.label), 
+        gdpPerCapitaChartData.map(r => r.value), 
         'gdp-per-capita-chart', 
-        metropolitanRegionsDetails.value.metropolitanRegions.slice(1,10).map(r => r.gdpPerCapitaBrlAverage), 
         'red')
-      // drawChart(gdpGrowthChart as Ref<Chart>, selectedFeatureLabel.value, 
-      //   'Crescimendo PIB', 'gdp-growth-chart', 
-      //   [selectedFeatureStats.value?.nationalTotalGdpBrlGrowthPercentAverage??0, 
-      //     selectedFeatureStats.value?.featureTotalGdpBrlGrowthPercentAverage??0], 'green')
-      // drawChart(popGrowthChart as Ref<Chart>, selectedFeatureLabel.value, 
-      //   'Crescimento Pop', 'pop-growth-chart', 
-      //   [selectedFeatureStats.value?.nationalPopulationGrowthPercentAverage??0, 
-      //     selectedFeatureStats.value?.featurePopulationGrowthPercentAverage??0], 'blue')
+
+      // Render Gdp Growth Chart
+      const gdpGrowthChartData = metropolitanRegionsDetails.value.
+        metropolitanRegions.map(r => ({
+          label: r.metropolitanRegionName,
+          value: r.totalGdpBrlGrowthPercentAverage
+        })).sort((r1, r2) => r1.value > r2.value? -1: 1)
+        .slice(0, 5)
+
+      drawChart(gdpGrowthChart as Ref<Chart>,
+        metropolitanRegionsDetails.value.nationalTotalGdpBrlGrowthPercentAverage,
+        gdpGrowthChartData.map(r => r.label), 
+        gdpGrowthChartData.map(r => r.value), 
+        'gdp-growth-chart', 
+        'green')
+
+      // Render Population growth Chart
+      const popGrowthChartData = metropolitanRegionsDetails.value.
+        metropolitanRegions.map(r => ({
+          label: r.metropolitanRegionName,
+          value: r.populationGrowthPercentAverage
+        })).sort((r1, r2) => r1.value > r2.value? -1: 1)
+        .slice(0, 5)
+
+      drawChart(popGrowthChart as Ref<Chart>,
+        metropolitanRegionsDetails.value.nationalPopulationGrowthPercentAverage,
+        popGrowthChartData.map(r => r.label), 
+        popGrowthChartData.map(r => r.value), 
+        'pop-growth-chart', 
+        'blue')
     }
 
     return {
@@ -317,10 +346,5 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.metropolitan-regions-details__option {
-  border: 1px solid black;
-  padding: 4px;
 }
 </style>
