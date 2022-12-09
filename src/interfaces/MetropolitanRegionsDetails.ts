@@ -1,7 +1,7 @@
 interface MetropolitanRegionDetails {
   metropolitanRegionName: string
   stateAcronym: string
-  oopulation: number
+  population: number
   totalGdp1000Brl: number
   gdpPerCapitaBrlAverage: number
   totalGdpBrlGrowthPercentAverage: number

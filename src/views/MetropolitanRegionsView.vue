@@ -28,6 +28,14 @@
           <LoadingBars/>
         </div>
         <div v-if="!isDetailsLoading">
+          <h3 class="metropolitan-regions-details__option">População</h3>
+          <canvas id="population-chart"></canvas>
+        </div>
+        <div v-if="!isDetailsLoading">
+          <h3 class="metropolitan-regions-details__option">PIB</h3>
+          <canvas id="total-gdp-chart"></canvas>
+        </div>
+        <div v-if="!isDetailsLoading">
           <h3 class="metropolitan-regions-details__option">PIB per Capita</h3>
           <canvas id="gdp-per-capita-chart"></canvas>
         </div>
@@ -76,6 +84,8 @@ export default defineComponent({
     const metropolitanRegionColorMap = ref<{color: string, name: string}[]>([])
     Chart.register(...registerables)
     Chart.register(ChartAnnotationsPlugin);
+    const populationChart = ref<Chart>()
+    const totalGdpChart = ref<Chart>()
     const gdpPerCapitaChart = ref<Chart>()
     const gdpGrowthChart = ref<Chart>()
     const popGrowthChart = ref<Chart>()
@@ -159,13 +169,13 @@ export default defineComponent({
               display: false
             },
             annotation: {
-              annotations: [
+              annotations: nationalAverage? [
                 {
                   type: 'line',
                   scaleID: 'x',
                   value: nationalAverage,
                 }
-              ]
+              ]: []
             }
           },
           indexAxis: 'y',
@@ -185,6 +195,36 @@ export default defineComponent({
       metropolitanRegionsDetails.value = await fetchDetails()
       isDetailsLoading.value = false
       await nextTick()
+
+      // Render Population Chart
+      const populationChartData = metropolitanRegionsDetails.value.
+        metropolitanRegions.map(r => ({
+          label: r.metropolitanRegionName,
+          value: r.population
+        })).sort((r1, r2) => r1.value > r2.value? -1: 1)
+        .slice(0, 5)
+
+      drawChart(populationChart as Ref<Chart>,
+        0,
+        populationChartData.map(r => r.label), 
+        populationChartData.map(r => r.value), 
+        'population-chart', 
+        'black')
+
+      // Total Gdp Chart
+      const totalGdpChartData = metropolitanRegionsDetails.value.
+        metropolitanRegions.map(r => ({
+          label: r.metropolitanRegionName,
+          value: r.totalGdp1000Brl
+        })).sort((r1, r2) => r1.value > r2.value? -1: 1)
+        .slice(0, 5)
+
+      drawChart(totalGdpChart as Ref<Chart>,
+        0,
+        totalGdpChartData.map(r => r.label), 
+        totalGdpChartData.map(r => r.value), 
+        'total-gdp-chart', 
+        'purple')
 
       // Render Gdp per Capita Chart
       const gdpPerCapitaChartData = metropolitanRegionsDetails.value.
