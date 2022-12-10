@@ -166,7 +166,15 @@ export default defineComponent({
         options: {
           plugins: {
             legend: {
-              display: false
+              display: nationalAverage? true: false,
+              labels: {
+                color: 'black',
+                boxHeight: 1,
+                boxWidth: 20,
+                generateLabels: () => [{
+                  text: 'Média Nacional'
+                }]
+              }
             },
             annotation: {
               annotations: nationalAverage? [
@@ -279,7 +287,6 @@ export default defineComponent({
       isDetailsLoading,
       svgLoaded: () => console.log('svgLoaded'),
       svgLoadError: () => console.log('svgLoadError'),
-      showFeatureDetails: () => console.log('showFeatureDetails'),
       cityClick: (code: string) => {
         if(selectedCity.value == code) {
           selectedCity.value = ''
@@ -297,7 +304,7 @@ export default defineComponent({
       pathMapLoaded: (pathMap: { [code: string] : Element | null; }) => {
         loadData()
           .then(() => colorizePaths(pathMap))
-          .then(loadDetails)
+        loadDetails()
       },
     }
   }
