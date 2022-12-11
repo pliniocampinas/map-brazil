@@ -2,21 +2,13 @@
   <div class="map__municipalities">
     <MapBrowser :isLoading="isLoading">
       <template v-slot:map-svg>
-        <svg id="municipalities-svg">
-          <g>
-            <path
-              v-for="(visualizationData, index) in municipalitiesList2019"
-              class="map__municipality"
-              :d="path(visualizationData.feature)"
-              :key="index"
-              :description="visualizationData.name"
-              :citycode="visualizationData.code"
-              @click="handleClick(visualizationData)"
-            >
-              <title>{{ visualizationData.name }}</title>
-            </path>
-          </g>
-        </svg>
+        <BrazilMunicipalitiesMap
+          class="map__municipalities__map"
+          :selectedCityCode="selectedCityCode"
+          @city-click="cityClick"
+          @path-map-loaded="pathMapLoaded"
+        >
+        </BrazilMunicipalitiesMap>
       </template>
 
       <template v-slot:browser-options>
@@ -61,19 +53,16 @@
 
 <script lang="ts">
 import * as d3 from "d3";
-import { computed, defineComponent, onBeforeMount, ref, reactive, watch, nextTick } from 'vue';
-import municipalitiesTopoJson from '@/assets/topojson-100-mun.json'
-import { feature } from 'topojson-client'
-import { GeometryObject, Topology } from 'topojson-specification';
-import { geoPath, geoEqualEarth, min, max } from 'd3';
-import { FeatureCollection, rewind } from '@turf/turf';
+import { computed, defineComponent, ref, reactive, watch, nextTick } from 'vue';
 import { fetchData } from '@/services/GetCityGdpService';
 import { formatCurrencyBrl } from '@/utils/formatters';
 import { sleep } from '@/utils/timeHelper';
 import MunicipalitiesData from '@/interfaces/MunicipalitiesData';
 import MapBrowser from '@/components/MapBrowser.vue';
+import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import SimpleSelect from '@/components/SimpleSelect.vue';
 import TimelineControl from '@/components/TimelineControl.vue';
+import { max, min } from "d3";
 
 const getColorFunction = (dataset: number[]) => {
   // Between [0, 1], 5 numbers for 5 tones.
@@ -95,12 +84,12 @@ export default defineComponent({
     MapBrowser,
     SimpleSelect,
     TimelineControl,
+    BrazilMunicipalitiesMap
   },
 
   setup() {
     const FIRST_YEAR = 2010
     const LAST_YEAR = 2019
-    const pathElementsMap: { [code: string] : Element | null; } = {}
     const visualizationOptions = [
       {
         label: 'PIB per Capita',
@@ -117,52 +106,22 @@ export default defineComponent({
     const maxValue = ref(0)
     const isLoading = ref(false)
     const isPlaying = ref(false)
+    const pathElementsMap = ref<{ [code: string] : Element | null;}>({})
+    const selectedCityCode = ref('')
     const selectedCity = reactive({
       cityCode: "",
       cityName: "",
       cityGdp: 0,
       cityGdpPerCapita: 0,
     })
-
-    const topology = (municipalitiesTopoJson as unknown) as Topology
-    const geometries = municipalitiesTopoJson.objects['geojs-100-mun'] as GeometryObject
-    const geoData = feature(topology, geometries) as FeatureCollection
-
-    // Scale and translate to fit Brazil at the center of the projection
-    const projection = geoEqualEarth()
-      .scale(700)
-      .translate([800, 80])
-
-    const features = geoData.features?? []
     const municipalitiesList = ref<MunicipalitiesData[]>([])
     const municipalitiesList2019 = ref<MunicipalitiesData[]>([])
-
-    // D3 expects geometry coordinates to be clockwise, 
-    // otherwise some paths might be rendered too large 
-    // turf rewind function handles this edge case
-    features.forEach((feature) => {
-      if(!feature.geometry) {
-        return
-      }
-      // Mutate object
-      feature.geometry = rewind(feature.geometry, {reverse:true})
-    })
-
-    onBeforeMount(async () => {
-      await loadData()
-    })
 
     const loadData = async () => {
       isLoading.value = true
       try {
         const data = await fetchData()
-        municipalitiesList.value = data.map(municipality => {
-        const municipalityFeature = features.find(feature => municipality.code === feature.properties?.id)
-          return {
-            ...municipality,
-            feature: municipalityFeature
-          }
-        })
+        municipalitiesList.value = data
         municipalitiesList2019.value = municipalitiesList.value.filter(m => m.year === LAST_YEAR)
         isLoading.value = false
 
@@ -175,33 +134,11 @@ export default defineComponent({
       }
     }
 
-    const handleClick = (municipality: MunicipalitiesData) => {
-      selectedCity.cityCode = municipality.code
-      selectedCity.cityName = municipality.name
-      selectedCity.cityGdp = municipality.gdpThousandsBrl?? 0
-      selectedCity.cityGdpPerCapita = municipality.gdpPerCapitaBrl?? 0
-    }
-
     const handleVisualizationChange = (value: string) => {
       selectedVisualization.value = value
     }
 
-    const getPathElement = (code: string) => {
-      return document.querySelector(`path[citycode="${code}"]`)
-    }
-
     const colorizePaths = () => {
-      const firstRender = !municipalitiesList2019.value[0].pathElement
-      if(firstRender) {
-        municipalitiesList2019.value.forEach(d => {
-          if(!d.pathElement) {
-            const pathElement = document.querySelector(`path[citycode="${d.code}"]`)
-            d.pathElement = pathElement
-            pathElementsMap[d.code] = pathElement
-          }
-        })
-      }
-
       const mainValues = municipalitiesList.value
         .filter(d => d.year === selectedYear.value)
         .map(municipality => getMainAttribute(municipality))
@@ -209,12 +146,25 @@ export default defineComponent({
       currentVisualizationDataList.value.forEach(d => {
         const color = getColor(getMainAttribute(d))
         if(!d.pathElement) {
-          d.pathElement = pathElementsMap[d.code]
+          d.pathElement = pathElementsMap.value[d.code]
         }
         if(d.pathElement) {
           d.pathElement.setAttribute("fill", color+'')
         }
       })
+    }
+
+    const cityClick = (code: string) => {
+      if(selectedCityCode.value == code) {
+        selectedCityCode.value = ''
+        return
+      }
+      selectedCityCode.value = code;
+      const city = municipalitiesList.value.find(city => city.year===selectedYear.value && city.code===code)
+      selectedCity.cityCode = city?.code??''
+      selectedCity.cityName = city?.name??''
+      selectedCity.cityGdp = city?.gdpThousandsBrl?? 0
+      selectedCity.cityGdpPerCapita = city?.gdpPerCapitaBrl?? 0
     }
 
     const computeDetails = () => {
@@ -234,6 +184,12 @@ export default defineComponent({
       }
       return 0
     }
+
+    const pathMapLoaded = (pathMap: { [code: string] : Element | null; }) => {
+      pathElementsMap.value = pathMap
+      loadData()
+        .then(() => colorizePaths())
+    }
     
     const currentVisualizationDataList = computed(() => {
       return municipalitiesList.value.filter(d => d.year === selectedYear.value)
@@ -243,7 +199,7 @@ export default defineComponent({
       isPlaying.value = true
       selectedYear.value = FIRST_YEAR
       while(selectedYear.value !== LAST_YEAR) {
-        await sleep(700)
+        await sleep(800)
         selectedYear.value++
       }
       isPlaying.value = false
@@ -252,18 +208,6 @@ export default defineComponent({
     const handleTick = (index: number) => {
       selectedYear.value = FIRST_YEAR + index
     }
-
-    watch(
-      () => selectedCity.cityCode,
-      (code, prevCode) => {
-        if(prevCode) {
-          const previouslySelectedPathElement = getPathElement(prevCode)
-          previouslySelectedPathElement?.classList.remove('map__municipality--selected')
-        }
-        const selectedPathElement = getPathElement(code)
-        selectedPathElement?.classList.add('map__municipality--selected')
-      }
-    )
 
     watch(selectedVisualization, () => {
       computeDetails()
@@ -282,12 +226,13 @@ export default defineComponent({
       isPlaying,
       minValue,
       maxValue,
+      selectedCityCode,
       selectedCity,
       selectedYear,
       municipalitiesList2019,
-      path: geoPath(projection),
+      cityClick,
+      pathMapLoaded,
       formatCurrencyBrl,
-      handleClick,
       handleVisualizationChange,
       playMap,
       handleTick,
@@ -315,8 +260,7 @@ export default defineComponent({
   stroke: #cccccc;
 }
 
-#municipalities-svg {
-  width:  auto;
-  height: 400px;
+.map__municipalities__map {
+  height: 500px;
 }
 </style>

@@ -19,10 +19,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
+import { defineComponent } from 'vue';
 import LoadingBars from '@/components/LoadingBars.vue';
-import { sleep } from '@/utils/timeHelper';
-import svgPanZoom from 'svg-pan-zoom'
 
 export default defineComponent({
   name: 'MapBrowser',
@@ -36,21 +34,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-  },
-
-  setup(props) {
-
-    const setPanZoom = () => {
-      sleep(500).then(() => {
-        svgPanZoom('.map__browser__svg-container svg');
-      })
-    }
-
-    watch(() => props.isLoading, setPanZoom)
-
-    return {
-      setPanZoom,
-    }
   },
 });
 </script>
