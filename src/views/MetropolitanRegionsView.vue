@@ -15,14 +15,16 @@
       <div class="metropolitan-regions__labels">
         <div class="metropolitan-regions__label">
           <span class="metropolitan-regions__label__text">
-          Clique em uma região metropolitana para ver detalhes
+          Clique em uma região metropolitana para ver o nome
           </span>
         </div>
       </div>
     </div>
     <div class="metropolitan-regions-details__container">
+      <div class="metropolitan-regions__selected-region">
+        <h3 class="metropolitan-regions__selected-region-heading">{{ selectedMetropolitanRegion.length > 0? selectedMetropolitanRegion: 'Selecione uma região' }}</h3>
+      </div>
       <h1 class="metropolitan-regions-details__heading">Detalhes</h1>
-      <h3 class="metropolitan-regions-details__heading">{{ selectedMetropolitanRegion }}</h3>
       <div class="metropolitan-regions-details__graph" >
         <div class="metropolitan-regions-details__loading" v-if="isDetailsLoading">
           <LoadingBars/>
@@ -393,5 +395,18 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.metropolitan-regions__selected-region {
+  border: 1px solid black;
+  padding: 8px 4px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metropolitan-regions__selected-region-heading {
+  margin: 0px;
 }
 </style>
