@@ -4,6 +4,8 @@ import StatesCsvSchema from '@/interfaces/StatesCsvSchema';
 
 const stateSchemaToGraph = (stateCsv: StatesCsvSchema): StateGraphData => {
   return {
+    name: stateCsv.unidade_federativa,
+    position2019: parseInt(stateCsv.posicao_2019),
     gdpPerCapita: parseFloat(stateCsv.pib_per_capita_brl),
     stateCode: stateCsv.sigla_uf
   }
