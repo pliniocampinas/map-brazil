@@ -5,10 +5,15 @@
       <h2>Min: {{ formatCurrencyBrl(minValue) }}</h2>
       <h2>Max: {{ formatCurrencyBrl(maxValue) }}</h2>
     </div>
+    
     <BrazilStatesMap
-      @loaded="statesSvgLoaded"
+      class="map__states__map"
+      :selectedState="selectedStateCode"
+      @state-click="stateClick"
+      @path-map-loaded="statesSvgLoaded"
     >
     </BrazilStatesMap>
+
   </div>
 </template>
 
@@ -64,6 +69,7 @@ export default defineComponent({
   },
 
   setup() {
+    const selectedStateCode = ref('')
     const minValue = ref(0);
     const maxValue = ref(0);
     
@@ -74,8 +80,18 @@ export default defineComponent({
       styleMap(graphData, { maxValue: maxValue.value });
     }
 
+    const stateClick = (code: string) => {
+      if(selectedStateCode.value == code) {
+        selectedStateCode.value = ''
+        return
+      }
+      selectedStateCode.value = code;
+    }
+
     return {
+      selectedStateCode,
       statesSvgLoaded,
+      stateClick,
       formatCurrencyBrl,
       minValue,
       maxValue,
