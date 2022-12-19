@@ -32,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'MetropolitanRegions',
     component: () => import(/* webpackChunkName: "metropolitan-regions-view" */ '../views/MetropolitanRegionsView.vue')
   },
+  {
+    path: '/maps/funds',
+    name: 'BrazilRealStateFundsView',
+    component: () => import(/* webpackChunkName: "real-state-view" */ '../views/BrazilRealStateFundsView.vue')
+  },
 ]
 
 const router = createRouter({

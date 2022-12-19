@@ -34,7 +34,11 @@ const navLinks = [
   {
     text: 'Mapa regiões metropolitanas',
     to: '/maps/metropolitan-regions',
-  }
+  },
+  {
+    text: 'Mapa FIIs',
+    to: '/maps/funds',
+  },
 ]
 
 // functions
