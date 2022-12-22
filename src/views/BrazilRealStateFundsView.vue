@@ -51,6 +51,20 @@ import BrazilStatesMap from '@/components/BrazilStatesMap.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
 import Fund from '@/interfaces/Fund';
 import AssetsPerState from '@/interfaces/AssetsPerState';
+import { interpolateYlGn, scaleQuantile } from 'd3';
+
+const getColorFunction = (dataset: number[]) => {
+  // Between [0, 1], 5 numbers for 5 tones.
+  const scaleOfColor = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+  const interpolator = interpolateYlGn
+  const colors = scaleOfColor.map(x => interpolator(x))
+
+  const getColor = scaleQuantile<string, number>()
+    .domain(dataset)
+    .range(colors)
+
+  return getColor
+}
 
 export default defineComponent({
   name: 'BrazilRealStateFunds',
@@ -82,15 +96,22 @@ export default defineComponent({
       await sleep(400)
       funds.value = await fetchFunds()
       assetsPerStateService.value = await fetchAssetsPerStateService()
-      colorMap()
+      colorizeMap()
       isLoading.value = false
     }
 
-    // TODO
-    const colorMap = () => {
-      console.log('colorMap')
-      pathElementsMap.value['PA']?.setAttribute("style", '')
-      pathElementsMap.value['PA']?.setAttribute("fill", 'red')
+    const colorizeMap = () => {
+      const mainValues = assetsPerStateService.value
+        .map(state => state.assetsCount)
+      const getColor = getColorFunction(mainValues)
+      assetsPerStateService.value.forEach(s => {
+        const color = getColor(s.assetsCount)
+        const pathElement = pathElementsMap.value[s.stateAcronym]
+        if(pathElement) {
+          pathElement.setAttribute("style", '')
+          pathElement.setAttribute("fill", color+'')
+        }
+      })
     }
 
     const stateClick = (code: string) => {
