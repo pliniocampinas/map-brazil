@@ -107,10 +107,12 @@ export default defineComponent({
       assetsPerStateService.value.forEach(s => {
         const color = getColor(s.assetsCount)
         const pathElement = pathElementsMap.value[s.stateAcronym]
-        if(pathElement) {
-          pathElement.setAttribute("style", '')
-          pathElement.setAttribute("fill", color+'')
+        if(!pathElement) {
+          console.warn('Path element not found on pathElementMap', s.stateAcronym)
+          return
         }
+        pathElement.setAttribute("style", '')
+        pathElement.setAttribute("fill", color+'')
       })
     }
 
