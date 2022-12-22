@@ -23,19 +23,34 @@
       </template>
 
       <template v-slot:browser-details>
-        <h4>browser-details</h4>
+        <h4>Estado</h4>
+        <template v-if="selectedStateCode">
+          <p>
+            {{ selectedStateDetails.acronym }}
+          </p>
+          <p>Número de ativos: {{ selectedStateDetails.assetsCount }}</p>
+        </template>
+        <template v-else>
+          <p>
+            Selecione um estado para ver detalhes
+          </p>
+          <p style="visibility: hidden;">Placeholder</p>
+          <p style="visibility: hidden;">Placeholder</p>
+        </template>
       </template>
     </MapBrowser>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { fetchData as fetchFunds } from '@/services/GetFundsService';
+import { fetchData as fetchAssetsPerStateService } from '@/services/GetAssetsPerStateService';
 import { sleep } from '@/utils/timeHelper';
 import BrazilStatesMap from '@/components/BrazilStatesMap.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
 import Fund from '@/interfaces/Fund';
+import AssetsPerState from '@/interfaces/AssetsPerState';
 
 export default defineComponent({
   name: 'BrazilRealStateFunds',
@@ -50,18 +65,40 @@ export default defineComponent({
     const selectedStateCode = ref('')
     const selectedFund = ref('')
     const funds = ref([] as Fund[])
+    const assetsPerStateService = ref([] as AssetsPerState[])
+    const pathElementsMap = ref<{ [code: string] : Element | null;}>({})
+
+    const selectedStateDetails = computed(() => {
+      const state = assetsPerStateService.value.find(state => state.stateAcronym == selectedStateCode.value)
+      return {
+        acronym: state?.stateAcronym?? '',
+        assetsCount: state?.assetsCount?? 0,
+      }
+    })
 
     const statesSvgLoaded = async (pathMap: { [code: string] : Element | null; }) => {
       isLoading.value = true
-      pathMap['PA']?.setAttribute("style", '')
-      pathMap['PA']?.setAttribute("fill", 'red')
+      pathElementsMap.value = pathMap
       await sleep(400)
       funds.value = await fetchFunds()
+      assetsPerStateService.value = await fetchAssetsPerStateService()
+      colorMap()
       isLoading.value = false
     }
 
+    // TODO
+    const colorMap = () => {
+      console.log('colorMap')
+      pathElementsMap.value['PA']?.setAttribute("style", '')
+      pathElementsMap.value['PA']?.setAttribute("fill", 'red')
+    }
+
     const stateClick = (code: string) => {
-      console.log('state click', code)
+      if(selectedStateCode.value == code) {
+        selectedStateCode.value = ''
+        return
+      }
+      selectedStateCode.value = code
     }
 
     return {
@@ -69,6 +106,7 @@ export default defineComponent({
       selectedStateCode,
       selectedFund,
       funds,
+      selectedStateDetails,
       statesSvgLoaded,
       stateClick,
     }
