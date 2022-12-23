@@ -105,14 +105,24 @@ export default defineComponent({
         .map(state => state.assetsCount)
       const getColor = getColorFunction(mainValues)
       assetsPerStateService.value.forEach(s => {
-        const color = getColor(s.assetsCount)
+        const color = getColor(s.assetsCount).toString()
         const pathElement = pathElementsMap.value[s.stateAcronym]
         if(!pathElement) {
           console.warn('Path element not found on pathElementMap', s.stateAcronym)
           return
         }
-        pathElement.setAttribute("style", '')
-        pathElement.setAttribute("fill", color+'')
+        console.log('color', color)
+        const red = color
+          .replace('rgb', '')
+          .replace('(', '')
+          .replace(')', '')
+          .split(',')[0]
+        if(parseInt(red) > 124) {
+          pathElement.setAttribute('dark-mode', '')
+        }
+        //
+        pathElement.setAttribute('style', '')
+        pathElement.setAttribute("fill", color)
       })
     }
 

@@ -85,17 +85,24 @@ setup(props, { emit }) {
 <style>
 a.estado:hover,
 .map__state--selected {
-  filter: brightness(1.2);
-  /* opacity: 0.7; */
+  filter: brightness(1.5);
   cursor: pointer;
 }
 
-a.estado:hover text {
+.map__state--selected + text,
+a.estado:hover text,
+a.estado path[dark-mode] + text {
   filter: invert(1);
 }
 
-a.estado:hover path.circle {
-  filter: invert(1);
+a.estado:hover path[dark-mode],
+.map__state--selected[dark-mode] {
+  filter: brightness(0.5);
+}
+
+a.estado:hover path.circle,
+.map__state--selected + .circle {
+  filter: brightness(1.5);
 }
 
 .brazil-states-map svg {
