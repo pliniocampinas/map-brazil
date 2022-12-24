@@ -14,7 +14,8 @@
       <template v-slot:browser-options>
         <div>
           <strong>Fundos: </strong>
-          <select v-model="selectedFund">
+          <select @change="fundSelected">
+            <option value="">Todos</option>
             <option v-for="(fund, index) in funds" :value="fund.acronym" :key="index">
               {{fund.acronym}}
             </option>
@@ -111,7 +112,6 @@ export default defineComponent({
           console.warn('Path element not found on pathElementMap', s.stateAcronym)
           return
         }
-        console.log('color', color)
         const red = color
           .replace('rgb', '')
           .replace('(', '')
@@ -134,10 +134,21 @@ export default defineComponent({
       selectedStateCode.value = code
     }
 
+    const fundSelected = async ({target}: {target: HTMLInputElement}) => {
+      selectedFund.value = target?.value
+      console.log('fundSelected', selectedFund.value)
+      isLoading.value = true
+      await sleep(400)
+      assetsPerStateService.value = await fetchAssetsPerStateService(selectedFund.value)
+      colorizeMap()
+      isLoading.value = false
+    }
+
     return {
       isLoading,
       selectedStateCode,
       selectedFund,
+      fundSelected,
       funds,
       selectedStateDetails,
       statesSvgLoaded,
