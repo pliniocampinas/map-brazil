@@ -5,6 +5,7 @@
         <BrazilStatesMap
           class="brazil-real-state-funds__map"
           hideCircles
+          hideLabels
           :selectedState="selectedStateCode"
           @state-click="stateClick"
           @path-map-loaded="statesSvgLoaded"

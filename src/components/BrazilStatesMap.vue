@@ -1,5 +1,12 @@
 <template>
-  <div class="brazil-states-map" ref="mapContainerElement" :class="hideCircles?'brazil-states-map--no-circles':''">
+  <div 
+    class="brazil-states-map" 
+    ref="mapContainerElement" 
+    :class="{
+      'brazil-states-map--no-circles': hideCircles,
+      'brazil-states-map--no-labels': hideLabels,
+    }"
+  >
     <inline-svg 
       :src="require('../assets/brazil-states.svg')"
       @loaded="svgLoaded"
@@ -28,6 +35,10 @@ export default defineComponent({
       default: null
     },
     hideCircles: {
+      type: Boolean,
+      default: false
+    },
+    hideLabels: {
       type: Boolean,
       default: false
     },
@@ -87,7 +98,8 @@ setup(props, { emit }) {
 </script>
 
 <style>
-.brazil-states-map--no-circles .circle {
+.brazil-states-map--no-circles .circle,
+.brazil-states-map--no-labels text {
   display: none;
 }
 
