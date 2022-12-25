@@ -1,5 +1,5 @@
 <template>
-  <div class="brazil-states-map" ref="mapContainerElement">
+  <div class="brazil-states-map" ref="mapContainerElement" :class="hideCircles?'brazil-states-map--no-circles':''">
     <inline-svg 
       :src="require('../assets/brazil-states.svg')"
       @loaded="svgLoaded"
@@ -26,6 +26,10 @@ export default defineComponent({
     selectedState: {
       type: String,
       default: null
+    },
+    hideCircles: {
+      type: Boolean,
+      default: false
     },
   },
 
@@ -83,6 +87,10 @@ setup(props, { emit }) {
 </script>
 
 <style>
+.brazil-states-map--no-circles .circle {
+  display: none;
+}
+
 a.estado:hover,
 .map__state--selected {
   filter: brightness(1.5);

@@ -4,6 +4,7 @@
       <template v-slot:map-svg>
         <BrazilStatesMap
           class="brazil-real-state-funds__map"
+          hideCircles
           :selectedState="selectedStateCode"
           @state-click="stateClick"
           @path-map-loaded="statesSvgLoaded"
