@@ -107,6 +107,14 @@ export default defineComponent({
       const mainValues = assetsPerStateService.value
         .map(state => state.assetsCount)
       const getColor = getColorFunction(mainValues)
+
+      // Clear and set default color
+      const statesValues = Object.entries(pathElementsMap.value)
+      statesValues.forEach(([_, path]) => {
+        path?.setAttribute('style', '')
+        path?.setAttribute("fill", '#ccc')
+      })
+
       assetsPerStateService.value.forEach(s => {
         const color = getColor(s.assetsCount).toString()
         const pathElement = pathElementsMap.value[s.stateAcronym]
@@ -123,7 +131,6 @@ export default defineComponent({
           pathElement.setAttribute('dark-mode', '')
         }
         //
-        pathElement.setAttribute('style', '')
         pathElement.setAttribute("fill", color)
       })
     }
@@ -138,7 +145,6 @@ export default defineComponent({
 
     const fundSelected = async ({target}: {target: HTMLInputElement}) => {
       selectedFund.value = target?.value
-      console.log('fundSelected', selectedFund.value)
       isLoading.value = true
       await sleep(400)
       assetsPerStateService.value = await fetchAssetsPerStateService(selectedFund.value)
