@@ -29,11 +29,13 @@
             {{ selectedStateDetails.acronym }}
           </p>
           <p>Número de ativos: {{ selectedStateDetails.assetsCount }}</p>
+          <p>Número de ativos: {{ selectedStateDetails.totalSquareMeters }}</p>
         </template>
         <template v-else>
           <p>
             Selecione um estado para ver detalhes
           </p>
+          <p style="visibility: hidden;">Placeholder</p>
           <p style="visibility: hidden;">Placeholder</p>
           <p style="visibility: hidden;">Placeholder</p>
         </template>
@@ -89,6 +91,7 @@ export default defineComponent({
       return {
         acronym: state?.stateAcronym?? '',
         assetsCount: state?.assetsCount?? 0,
+        totalSquareMeters: state?.totalSquareMeters?? 0,
       }
     })
 

@@ -13,6 +13,7 @@
       <p class="fund-selector__paragraph"><strong>Nome: </strong>{{ selectedFundDetails.longName?? '-' }}</p>
       <p class="fund-selector__paragraph"><strong>Administração: </strong>{{ selectedFundDetails.admin?? '-' }}</p>
       <p class="fund-selector__paragraph"><strong>Ativos: </strong>{{ selectedFundDetails.assetsCount?? '-' }}</p>
+      <p class="fund-selector__paragraph"><strong>Total m²: </strong>{{ selectedFundDetails.totalSquareMeters?? '-' }}</p>
     </div>
   </div>
 </template>

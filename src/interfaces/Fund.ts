@@ -3,4 +3,5 @@ export default interface Fund {
   longName: string
   admin: string
   assetsCount: number
+  totalSquareMeters: number
 }
