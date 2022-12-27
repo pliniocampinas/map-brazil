@@ -107,6 +107,8 @@ a.estado:hover,
 .map__state--selected {
   filter: brightness(1.5);
   cursor: pointer;
+  stroke-width: 4;
+  stroke: #fff;
 }
 
 .map__state--selected + text,
