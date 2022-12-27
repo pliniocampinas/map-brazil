@@ -14,20 +14,12 @@
       </template>
 
       <template v-slot:browser-options>
-        <div>
-          <strong>Fundos: </strong>
-          <select @change="fundSelected" class="brazil-real-state-funds__fund-details-select">
-            <option value="">Todos</option>
-            <option v-for="(fund, index) in funds" :value="fund.acronym" :key="index">
-              {{fund.acronym}}
-            </option>
-          </select>
-        </div>
-        <div>
-          <p class="brazil-real-state-funds__fund-details-p"><strong>Nome: </strong>{{ selectedFundDetails.longName?? '-' }}</p>
-          <p class="brazil-real-state-funds__fund-details-p"><strong>Administração: </strong>{{ selectedFundDetails.admin?? '-' }}</p>
-          <p class="brazil-real-state-funds__fund-details-p"><strong>Ativos: </strong>{{ selectedFundDetails.assetsCount?? '-' }}</p>
-        </div>
+        <FundSelector
+          :selectedFund="selectedFund"
+          :funds="funds"
+          @fund-selected="fundSelected"
+        >
+        </FundSelector>
       </template>
 
       <template v-slot:browser-details>
@@ -55,6 +47,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { fetchData as fetchFunds } from '@/services/GetFundsService';
 import { fetchData as fetchAssetsPerStateService } from '@/services/GetAssetsPerStateService';
 import { sleep } from '@/utils/timeHelper';
+import FundSelector from '@/components/FundSelector.vue';
 import BrazilStatesMap from '@/components/BrazilStatesMap.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
 import Fund from '@/interfaces/Fund';
@@ -79,6 +72,7 @@ export default defineComponent({
 
   components: {
     BrazilStatesMap,
+    FundSelector,
     MapBrowser,
   },
 
@@ -153,8 +147,8 @@ export default defineComponent({
       selectedStateCode.value = code
     }
 
-    const fundSelected = async ({target}: {target: HTMLInputElement}) => {
-      selectedFund.value = target?.value
+    const fundSelected = async (fundAcronym: string) => {
+      selectedFund.value = fundAcronym
       isLoading.value = true
       await sleep(400)
       assetsPerStateService.value = await fetchAssetsPerStateService(selectedFund.value)
@@ -178,18 +172,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.brazil-real-state-funds__fund-details-p {
-  margin: 4px;
-  font-size: small;
-  text-align: justify;
-}
 
-.brazil-real-state-funds__fund-details-select {
-  border: none; 
-  border-bottom: 1px solid black; 
-}
-
-.brazil-real-state-funds__fund-details-select:focus-visible {
-  outline: none; 
-}
 </style>
