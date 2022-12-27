@@ -16,12 +16,17 @@
       <template v-slot:browser-options>
         <div>
           <strong>Fundos: </strong>
-          <select @change="fundSelected">
+          <select @change="fundSelected" class="brazil-real-state-funds__fund-details-select">
             <option value="">Todos</option>
             <option v-for="(fund, index) in funds" :value="fund.acronym" :key="index">
               {{fund.acronym}}
             </option>
           </select>
+        </div>
+        <div>
+          <p class="brazil-real-state-funds__fund-details-p"><strong>Nome: </strong>{{ selectedFundDetails.longName?? '-' }}</p>
+          <p class="brazil-real-state-funds__fund-details-p"><strong>Administração: </strong>{{ selectedFundDetails.admin?? '-' }}</p>
+          <p class="brazil-real-state-funds__fund-details-p"><strong>Ativos: </strong>{{ selectedFundDetails.assetsCount?? '-' }}</p>
         </div>
       </template>
 
@@ -93,6 +98,11 @@ export default defineComponent({
       }
     })
 
+    const selectedFundDetails = computed(() => {
+      const fund = funds.value.find(f => f.acronym == selectedFund.value)
+      return {...fund}
+    })
+
     const statesSvgLoaded = async (pathMap: { [code: string] : Element | null; }) => {
       isLoading.value = true
       pathElementsMap.value = pathMap
@@ -156,6 +166,7 @@ export default defineComponent({
       isLoading,
       selectedStateCode,
       selectedFund,
+      selectedFundDetails,
       fundSelected,
       funds,
       selectedStateDetails,
@@ -166,3 +177,19 @@ export default defineComponent({
 });
 </script>
 
+<style scoped>
+.brazil-real-state-funds__fund-details-p {
+  margin: 4px;
+  font-size: small;
+  text-align: justify;
+}
+
+.brazil-real-state-funds__fund-details-select {
+  border: none; 
+  border-bottom: 1px solid black; 
+}
+
+.brazil-real-state-funds__fund-details-select:focus-visible {
+  outline: none; 
+}
+</style>
