@@ -2,15 +2,18 @@
   <div class="brazil-real-state-funds">    
     <MapBrowser :isLoading="isLoading">
       <template v-slot:map-svg>
-        <BrazilStatesMap
-          class="brazil-real-state-funds__map"
-          hideCircles
-          hideLabels
-          :selectedState="selectedStateCode"
-          @state-click="stateClick"
-          @path-map-loaded="statesSvgLoaded"
-        >
-        </BrazilStatesMap>
+        <div class="brazil-real-state-funds__map-container">
+          <BrazilStatesMap
+            class="brazil-real-state-funds__map"
+            hideCircles
+            hideLabels
+            :selectedState="selectedStateCode"
+            @state-click="stateClick"
+            @path-map-loaded="statesSvgLoaded"
+          >
+          </BrazilStatesMap>
+          <FundViewSwitcher @select-view="viewSelected" :selectedView="selectedView"/>
+        </div>
       </template>
 
       <template v-slot:browser-options>
@@ -49,6 +52,7 @@ import { fetchData as fetchFunds } from '@/services/GetFundsService';
 import { fetchData as fetchAssetsPerStateService } from '@/services/GetAssetsPerStateService';
 import { sleep } from '@/utils/timeHelper';
 import FundSelector from '@/components/FundSelector.vue';
+import FundViewSwitcher from '@/components/FundViewSwitcher.vue';
 import BrazilStatesMap from '@/components/BrazilStatesMap.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
 import Fund from '@/interfaces/Fund';
@@ -74,6 +78,7 @@ export default defineComponent({
   components: {
     BrazilStatesMap,
     FundSelector,
+    FundViewSwitcher,
     MapBrowser,
   },
 
@@ -81,6 +86,7 @@ export default defineComponent({
     const isLoading = ref(false)
     const selectedStateCode = ref('')
     const selectedFund = ref('')
+    const selectedView = ref('assets-count')
     const funds = ref([] as Fund[])
     const assetsPerStateService = ref([] as AssetsPerState[])
     const pathElementsMap = ref<{ [code: string] : Element | null;}>({})
@@ -158,12 +164,19 @@ export default defineComponent({
       isLoading.value = false
     }
 
+    const viewSelected = (view: string) => {
+      console.log('view', view)
+      selectedView.value = view
+    }
+
     return {
       isLoading,
       selectedStateCode,
       selectedFund,
       selectedFundDetails,
+      selectedView,
       fundSelected,
+      viewSelected,
       funds,
       selectedStateDetails,
       statesSvgLoaded,
@@ -174,5 +187,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
+.brazil-real-state-funds__map-container {
+  position: relative;
+}
 </style>
