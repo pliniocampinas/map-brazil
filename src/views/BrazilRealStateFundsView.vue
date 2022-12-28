@@ -29,13 +29,12 @@
             {{ selectedStateDetails.acronym }}
           </p>
           <p>Número de ativos: {{ selectedStateDetails.assetsCount }}</p>
-          <p>Número de ativos: {{ selectedStateDetails.totalSquareMeters }}</p>
+          <p>Total de m²: {{ selectedStateDetails.totalSquareMeters }}</p>
         </template>
         <template v-else>
           <p>
             Selecione um estado para ver detalhes
           </p>
-          <p style="visibility: hidden;">Placeholder</p>
           <p style="visibility: hidden;">Placeholder</p>
           <p style="visibility: hidden;">Placeholder</p>
         </template>
