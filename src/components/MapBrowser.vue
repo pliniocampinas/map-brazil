@@ -60,6 +60,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .map__browser__options {

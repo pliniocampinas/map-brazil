@@ -171,8 +171,11 @@ export default defineComponent({
       isLoading.value = false
     }
 
-    const viewSelected = (view: string) => {
+    const viewSelected = async (view: string) => {
       selectedView.value = view
+      isLoading.value = true
+      await sleep(200)
+      isLoading.value = false
       colorizeMap()
     }
 
