@@ -17,11 +17,14 @@
 - [x] Página básica de PIB dos estados. 
 - [x] Página de PIB dos municípios. 
 - [x] Página de mapa de regiões geográficas. 
+- [x] Página de regiões metropolitanas
+- [x] Melhorar pagina de mapa dos estados
+- [x] Mapa estados com fundos imobiliários
+- [ ] Listar fundos imobiliários e detalhes interativamente com o mapa
 - [ ] Renderizar imagens como fallback para rodar app sem API e banco de dados. 
 - [ ] (Optional) Alternativamente usar arquivos .csv como fallback
-- [ ] Página capitais e regiões metropolitanas
-- [ ] Página dsitancia do equador
-- [ ] Melhorar pagina de mapa dos estados
+- [ ] Página capitais
+- [ ] Página distancia do equador
 - [ ] Página de macro-regiões
 
 ## Run 
