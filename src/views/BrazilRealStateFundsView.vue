@@ -117,7 +117,7 @@ export default defineComponent({
 
     const colorizeMap = () => {
       const mainValues = assetsPerStateService.value
-        .map(state => state.assetsCount)
+        .map(getViewValue)
       const getColor = getColorFunction(mainValues)
 
       // Clear and set default color
@@ -127,11 +127,11 @@ export default defineComponent({
         path?.setAttribute("fill", '#ccc')
       })
 
-      assetsPerStateService.value.forEach(s => {
-        const color = getColor(s.assetsCount).toString()
-        const pathElement = pathElementsMap.value[s.stateAcronym]
+      assetsPerStateService.value.forEach(state => {
+        const color = getColor(getViewValue(state)).toString()
+        const pathElement = pathElementsMap.value[state.stateAcronym]
         if(!pathElement) {
-          console.warn('Path element not found on pathElementMap', s.stateAcronym)
+          console.warn('Path element not found on pathElementMap', state.stateAcronym)
           return
         }
         const red = color
@@ -145,6 +145,13 @@ export default defineComponent({
         //
         pathElement.setAttribute("fill", color)
       })
+    }
+
+    const getViewValue = (state: AssetsPerState) => {
+      if(selectedView.value === 'square-meters') {
+        return state.totalSquareMeters
+      }
+      return state.assetsCount
     }
 
     const stateClick = (code: string) => {
@@ -167,6 +174,7 @@ export default defineComponent({
     const viewSelected = (view: string) => {
       console.log('view', view)
       selectedView.value = view
+      colorizeMap()
     }
 
     return {
