@@ -172,7 +172,6 @@ export default defineComponent({
     }
 
     const viewSelected = (view: string) => {
-      console.log('view', view)
       selectedView.value = view
       colorizeMap()
     }
