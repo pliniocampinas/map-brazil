@@ -41,7 +41,7 @@ export default defineComponent({
   position: absolute;
   right: 0;
   top: 0;
-  width: 180px;
+  width: 120px;
   padding: 20px 10px 2px 2px;
   display: flex;
   flex-direction: column;
