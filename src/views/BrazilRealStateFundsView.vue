@@ -43,11 +43,8 @@
         </template>
       </template>
     </MapBrowser>
-    <div class="brazil-real-state-funds__assets" style="max-height: 300px; overflow: scroll;">
-      <p class="" v-for="(asset, index) in assets" :key="index">
-        {{ asset.fundAcronym + ' - ' +  asset.stateAcronym }}
-      </p>
-    </div>
+    <AssetBrowser :assets="assets">
+    </AssetBrowser>
   </div>
 </template>
 
@@ -57,6 +54,7 @@ import { fetchData as fetchFunds } from '@/services/GetFundsService';
 import { fetchData as fetchAssets } from '@/services/GetAssetsService';
 import { fetchData as fetchAssetsPerStateService } from '@/services/GetAssetsPerStateService';
 import { sleep } from '@/utils/timeHelper';
+import AssetBrowser from '@/components/AssetBrowser.vue';
 import FundSelector from '@/components/FundSelector.vue';
 import FundViewSwitcher from '@/components/FundViewSwitcher.vue';
 import BrazilStatesMap from '@/components/BrazilStatesMap.vue';
@@ -83,6 +81,7 @@ export default defineComponent({
   name: 'BrazilRealStateFunds',
 
   components: {
+    AssetBrowser,
     BrazilStatesMap,
     FundSelector,
     FundViewSwitcher,
