@@ -43,12 +43,18 @@
         </template>
       </template>
     </MapBrowser>
+    <div class="brazil-real-state-funds__assets" style="max-height: 300px; overflow: scroll;">
+      <p class="" v-for="(asset, index) in assets" :key="index">
+        {{ asset.fundAcronym + ' - ' +  asset.stateAcronym }}
+      </p>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import { fetchData as fetchFunds } from '@/services/GetFundsService';
+import { fetchData as fetchAssets } from '@/services/GetAssetsService';
 import { fetchData as fetchAssetsPerStateService } from '@/services/GetAssetsPerStateService';
 import { sleep } from '@/utils/timeHelper';
 import FundSelector from '@/components/FundSelector.vue';
@@ -58,6 +64,7 @@ import MapBrowser from '@/components/MapBrowser.vue';
 import Fund from '@/interfaces/Fund';
 import AssetsPerState from '@/interfaces/AssetsPerState';
 import { interpolateYlGn, scaleQuantile } from 'd3';
+import Asset from '@/interfaces/Asset';
 
 const getColorFunction = (dataset: number[]) => {
   // Between [0, 1], 5 numbers for 5 tones.
@@ -88,6 +95,7 @@ export default defineComponent({
     const selectedFund = ref('')
     const selectedView = ref('assets-count')
     const funds = ref([] as Fund[])
+    const assets = ref([] as Asset[])
     const assetsPerStateService = ref([] as AssetsPerState[])
     const pathElementsMap = ref<{ [code: string] : Element | null;}>({})
 
@@ -154,12 +162,17 @@ export default defineComponent({
       return state.assetsCount
     }
 
-    const stateClick = (code: string) => {
+    const stateClick = async (code: string) => {
       if(selectedStateCode.value == code) {
         selectedStateCode.value = ''
         return
       }
       selectedStateCode.value = code
+
+      assets.value = await fetchAssets({
+        fundAcronym: selectedFund.value,
+        stateAcronym: selectedStateCode.value,
+      })
     }
 
     const fundSelected = async (fundAcronym: string) => {
@@ -169,6 +182,10 @@ export default defineComponent({
       assetsPerStateService.value = await fetchAssetsPerStateService(selectedFund.value)
       colorizeMap()
       isLoading.value = false
+      assets.value = await fetchAssets({
+        fundAcronym: selectedFund.value,
+        stateAcronym: selectedStateCode.value,
+      })
     }
 
     const viewSelected = async (view: string) => {
@@ -180,6 +197,7 @@ export default defineComponent({
     }
 
     return {
+      assets,
       isLoading,
       selectedStateCode,
       selectedFund,
