@@ -26,21 +26,7 @@
       </template>
 
       <template v-slot:browser-details>
-        <h4>Estado</h4>
-        <template v-if="selectedStateCode">
-          <p>
-            {{ selectedStateDetails.acronym }}
-          </p>
-          <p>Número de ativos: {{ selectedStateDetails.assetsCount }}</p>
-          <p>Total de m²: {{ selectedStateDetails.totalSquareMeters }}</p>
-        </template>
-        <template v-else>
-          <p>
-            Selecione um estado para ver detalhes
-          </p>
-          <p style="visibility: hidden;">Placeholder</p>
-          <p style="visibility: hidden;">Placeholder</p>
-        </template>
+        <FundStateDetails :state="selectedStateDetails"/>
       </template>
     </MapBrowser>
     <AssetBrowser :assets="assets">
@@ -56,6 +42,7 @@ import { fetchData as fetchAssetsPerStateService } from '@/services/GetAssetsPer
 import { sleep } from '@/utils/timeHelper';
 import AssetBrowser from '@/components/AssetBrowser.vue';
 import FundSelector from '@/components/FundSelector.vue';
+import FundStateDetails from '@/components/FundStateDetails.vue';
 import FundViewSwitcher from '@/components/FundViewSwitcher.vue';
 import BrazilStatesMap from '@/components/BrazilStatesMap.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
@@ -84,6 +71,7 @@ export default defineComponent({
     AssetBrowser,
     BrazilStatesMap,
     FundSelector,
+    FundStateDetails,
     FundViewSwitcher,
     MapBrowser,
   },
