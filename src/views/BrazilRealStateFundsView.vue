@@ -152,14 +152,11 @@ export default defineComponent({
     const stateClick = async (code: string) => {
       if(selectedStateCode.value == code) {
         selectedStateCode.value = ''
+        await fetchAssetsWithQueryOnly()
         return
       }
       selectedStateCode.value = code
-
-      assets.value = await fetchAssets({
-        fundAcronym: selectedFund.value,
-        stateAcronym: selectedStateCode.value,
-      })
+      await fetchAssetsWithQueryOnly()
     }
 
     const fundSelected = async (fundAcronym: string) => {
@@ -169,10 +166,7 @@ export default defineComponent({
       assetsPerStateService.value = await fetchAssetsPerStateService(selectedFund.value)
       colorizeMap()
       isLoading.value = false
-      assets.value = await fetchAssets({
-        fundAcronym: selectedFund.value,
-        stateAcronym: selectedStateCode.value,
-      })
+      await fetchAssetsWithQueryOnly()
     }
 
     const viewSelected = async (view: string) => {
@@ -181,6 +175,17 @@ export default defineComponent({
       await sleep(200)
       isLoading.value = false
       colorizeMap()
+    }
+
+    const fetchAssetsWithQueryOnly = async () => {
+      if(selectedFund.value == '' && selectedStateCode.value == '') {
+        assets.value = []
+        return
+      }
+      assets.value = await fetchAssets({
+        fundAcronym: selectedFund.value,
+        stateAcronym: selectedStateCode.value,
+      })
     }
 
     return {
