@@ -11,7 +11,7 @@
         - <strong>City:</strong> {{ asset.city }} - {{ asset.stateAcronym }}
       </p>
       <p class="asset-browser__paragraph">
-        - <strong>Metros²:</strong> {{ asset.squareMeters }}
+        - <strong>Metros²:</strong> {{ asset.squareMeters.toLocaleString('pt-br') }}
       </p>
     </div>
   </div>

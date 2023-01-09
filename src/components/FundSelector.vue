@@ -44,7 +44,10 @@ setup(props, { emit }) {
     return {
       selectedFundDetails: computed(() => {
         const fund = props.funds.find(f => f.acronym == props.selectedFund)
-        return {...fund}
+        return {
+          ...fund,
+          totalSquareMeters: fund?.totalSquareMeters.toLocaleString('pt-br')
+        }
       }),
       fundSelected: ({target}: {target: HTMLInputElement}) => {
         emit('fund-selected', target?.value)

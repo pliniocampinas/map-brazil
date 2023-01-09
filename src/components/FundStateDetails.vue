@@ -3,7 +3,7 @@
     <h4 class="fund-state-details__heading">Estado:  {{ state.acronym? state.acronym: '' }}</h4>
     <template v-if="state.acronym">
       <p class="fund-state-details__paragraph">Número de ativos: {{ state.assetsCount }}</p>
-      <p class="fund-state-details__paragraph">Total de m²: {{ state.totalSquareMeters }}</p>
+      <p class="fund-state-details__paragraph">Total de m²: {{ state.totalSquareMeters.toLocaleString('pt-br') }}</p>
     </template>
     <template v-else>
       <p class="fund-state-details__paragraph">
