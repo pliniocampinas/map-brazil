@@ -20,12 +20,14 @@
 - [x] Página de regiões metropolitanas
 - [x] Melhorar pagina de mapa dos estados
 - [x] Mapa estados com fundos imobiliários
-- [ ] Listar fundos imobiliários e detalhes interativamente com o mapa
-- [ ] Renderizar imagens como fallback para rodar app sem API e banco de dados. 
+- [x] Listar fundos imobiliários e detalhes interativamente com o mapa
+- [ ] (Optional) Renderizar imagens como fallback para rodar app sem API e banco de dados. 
 - [ ] (Optional) Alternativamente usar arquivos .csv como fallback
 - [ ] Página capitais
 - [ ] Página distancia do equador
 - [ ] Página de macro-regiões
+- [ ] Mapa IDH e outros indicadores sociais
+- [ ] Novos mapas mundo e américa latina
 
 ## Run 
 
