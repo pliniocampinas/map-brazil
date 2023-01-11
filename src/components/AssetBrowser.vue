@@ -1,16 +1,20 @@
 <template>
   <div class="asset-browser">
+    <div class="asset-browser__header">
+      <h4 class="asset-browser__header__title">Fundos</h4>
+      <ArrowButton/>
+    </div>
     <div class="asset-browser__asset"
       v-for="(asset, index) in assets"
       :key="index"
     >
-      <h4 class="asset-browser__heading">
+      <h4 class="asset-browser__asset__heading">
         {{ asset.fundAcronym + ' - ' + asset.title }}
       </h4>
-      <p class="asset-browser__paragraph">
+      <p class="asset-browser__asset__paragraph">
         - <strong>City:</strong> {{ asset.city }} - {{ asset.stateAcronym }}
       </p>
-      <p class="asset-browser__paragraph">
+      <p class="asset-browser__asset__paragraph">
         - <strong>Metros²:</strong> {{ asset.squareMeters.toLocaleString('pt-br') }}
       </p>
     </div>
@@ -19,15 +23,24 @@
 
 <script lang="ts">
 import Asset from "@/interfaces/Asset";
+import ArrowButton from '@/components/ArrowButton.vue';
 import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   name: 'AssetBrowser',
 
+  components: {
+    ArrowButton,
+  },
+
   props: {
     assets: {
       type: Array as PropType<Array<Asset>>,
       default: () => []
+    },
+    isOpen: {
+      type: Boolean,
+      default: false
     },
   },
 });
@@ -44,6 +57,16 @@ export default defineComponent({
   row-gap: 8px;
 }
 
+.asset-browser__header {
+  display: flex;
+  align-items: center;
+  justify-content:space-between;
+}
+
+.asset-browser__header__title {
+  margin: 8px 0px;
+}
+
 .asset-browser__asset {
   padding: 4px 8px;
   border: 1px solid #ddd;
@@ -51,12 +74,12 @@ export default defineComponent({
   background-color: rgba(200, 200, 200, 0.3);
 }
 
-.asset-browser__heading {
+.asset-browser__asset-heading {
   margin: 4px 0px;
   text-align: justify;
 }
 
-.asset-browser__paragraph {
+.asset-browser__asset__paragraph {
   margin: 4px 0px;
   margin-left: 8px;
   text-align: justify;
