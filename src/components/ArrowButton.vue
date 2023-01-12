@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, PropType, computed } from "vue";
 
 enum Direction {
   Up = "up",
@@ -23,6 +23,17 @@ export default defineComponent({
       default: "up"
     }
   },
+
+  setup(props) {
+
+    const directionClass = computed(() => {
+      return `arrow-button__icon--${props.direction}`
+    })
+
+    return {
+      directionClass
+    }
+  }
 });
 </script>
 
@@ -36,5 +47,17 @@ export default defineComponent({
 .arrow-button__icon {
   height: 40px;
   width: 40px;
+}
+
+.arrow-button__icon[direction="right"] {
+  transform: rotate(90deg);
+}
+
+.arrow-button__icon[direction="down"] {
+  transform: rotate(180deg);
+}
+
+.arrow-button__icon[direction="left"] {
+  transform: rotate(270deg);
 }
 </style>

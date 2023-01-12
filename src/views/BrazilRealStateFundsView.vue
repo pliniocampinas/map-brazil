@@ -29,7 +29,11 @@
         <FundStateDetails :state="selectedStateDetails"/>
       </template>
     </MapBrowser>
-    <AssetBrowser :assets="assets">
+    <AssetBrowser 
+      :assets="assets"
+      :isOpen="isAssetBrowserOepn"
+      @open="oepnAssetBrowser"
+    >
     </AssetBrowser>
   </div>
 </template>
@@ -83,6 +87,7 @@ export default defineComponent({
     const selectedView = ref('assets-count')
     const funds = ref([] as Fund[])
     const assets = ref([] as Asset[])
+    const isAssetBrowserOepn = ref(false)
     const assetsPerStateService = ref([] as AssetsPerState[])
     const pathElementsMap = ref<{ [code: string] : Element | null;}>({})
 
@@ -188,9 +193,14 @@ export default defineComponent({
       })
     }
 
+    const oepnAssetBrowser = () => {
+      isAssetBrowserOepn.value = !isAssetBrowserOepn.value
+    }
+
     return {
       assets,
       isLoading,
+      isAssetBrowserOepn,
       selectedStateCode,
       selectedFund,
       selectedFundDetails,
@@ -201,6 +211,7 @@ export default defineComponent({
       selectedStateDetails,
       statesSvgLoaded,
       stateClick,
+      oepnAssetBrowser,
     }
   }
 });

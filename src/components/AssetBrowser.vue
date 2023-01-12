@@ -2,7 +2,7 @@
   <div class="asset-browser">
     <div class="asset-browser__header">
       <h4 class="asset-browser__header__title">Fundos</h4>
-      <ArrowButton/>
+      <ArrowButton :direction="isOpen? 'up': 'down'" @click="$emit('open')"/>
     </div>
     <div class="asset-browser__asset"
       v-for="(asset, index) in assets"
