@@ -2,7 +2,11 @@
   <div class="asset-browser">
     <div class="asset-browser__header">
       <h4 class="asset-browser__header__title">Fundos</h4>
-      <ArrowButton :direction="isOpen? 'up': 'down'" @click="oepnButtonClick"/>
+      <ArrowButton
+        :disabled="buttonDisabled"
+        :direction="isOpen? 'up': 'down'"
+        @click="oepnButtonClick"
+      />
     </div>
     <div class="asset-browser__assets" :class="isOpen? 'asset-browser__assets--expanded':''">
       <div class="asset-browser__asset"
@@ -26,7 +30,7 @@
 <script lang="ts">
 import Asset from "@/interfaces/Asset";
 import ArrowButton from '@/components/ArrowButton.vue';
-import { defineComponent, PropType } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 
 export default defineComponent({
   name: 'AssetBrowser',
@@ -48,6 +52,12 @@ export default defineComponent({
 
   setup(props, { emit }) {
     return {
+      buttonDisabled: computed(() => {
+        if(!props.assets || props.assets.length === 0) {
+          return true
+        }
+        return false
+      }),
       oepnButtonClick: () => {
         if(!props.assets || props.assets.length === 0) {
           return
