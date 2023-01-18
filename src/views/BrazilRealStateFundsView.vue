@@ -35,6 +35,9 @@
       @open="oepnAssetBrowser"
     >
     </AssetBrowser>
+    <AssetCharts
+      :states="assetsPerState"
+    />
   </div>
 </template>
 
@@ -45,6 +48,7 @@ import { fetchData as fetchAssets } from '@/services/GetAssetsService';
 import { fetchData as fetchAssetsPerStateService } from '@/services/GetAssetsPerStateService';
 import { sleep } from '@/utils/timeHelper';
 import AssetBrowser from '@/components/AssetBrowser.vue';
+import AssetCharts from '@/components/AssetCharts.vue';
 import FundSelector from '@/components/FundSelector.vue';
 import FundStateDetails from '@/components/FundStateDetails.vue';
 import FundViewSwitcher from '@/components/FundViewSwitcher.vue';
@@ -73,6 +77,7 @@ export default defineComponent({
 
   components: {
     AssetBrowser,
+    AssetCharts,
     BrazilStatesMap,
     FundSelector,
     FundStateDetails,
@@ -88,11 +93,11 @@ export default defineComponent({
     const funds = ref([] as Fund[])
     const assets = ref([] as Asset[])
     const isAssetBrowserOepn = ref(false)
-    const assetsPerStateService = ref([] as AssetsPerState[])
+    const assetsPerState = ref([] as AssetsPerState[])
     const pathElementsMap = ref<{ [code: string] : Element | null;}>({})
 
     const selectedStateDetails = computed(() => {
-      const state = assetsPerStateService.value.find(state => state.stateAcronym == selectedStateCode.value)
+      const state = assetsPerState.value.find(state => state.stateAcronym == selectedStateCode.value)
       return {
         acronym: state?.stateAcronym?? '',
         assetsCount: state?.assetsCount?? 0,
@@ -110,13 +115,13 @@ export default defineComponent({
       pathElementsMap.value = pathMap
       await sleep(400)
       funds.value = await fetchFunds()
-      assetsPerStateService.value = await fetchAssetsPerStateService()
+      assetsPerState.value = await fetchAssetsPerStateService()
       colorizeMap()
       isLoading.value = false
     }
 
     const colorizeMap = () => {
-      const mainValues = assetsPerStateService.value
+      const mainValues = assetsPerState.value
         .map(getViewValue)
       const getColor = getColorFunction(mainValues)
 
@@ -127,7 +132,7 @@ export default defineComponent({
         path?.setAttribute("fill", '#ccc')
       })
 
-      assetsPerStateService.value.forEach(state => {
+      assetsPerState.value.forEach(state => {
         const color = getColor(getViewValue(state)).toString()
         const pathElement = pathElementsMap.value[state.stateAcronym]
         if(!pathElement) {
@@ -168,7 +173,7 @@ export default defineComponent({
       selectedFund.value = fundAcronym
       isLoading.value = true
       await sleep(400)
-      assetsPerStateService.value = await fetchAssetsPerStateService(selectedFund.value)
+      assetsPerState.value = await fetchAssetsPerStateService(selectedFund.value)
       colorizeMap()
       isLoading.value = false
       await fetchAssetsWithQueryOnly()
@@ -199,6 +204,7 @@ export default defineComponent({
 
     return {
       assets,
+      assetsPerState,
       isLoading,
       isAssetBrowserOepn,
       selectedStateCode,
