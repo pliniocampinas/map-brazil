@@ -89,17 +89,18 @@ export default defineComponent({
 }
 
 .asset-browser__assets {
-  overflow: scroll;
-  max-height: 450px;
   flex-direction: column;
+  max-height: 0px;
   row-gap: 8px;
-  transition: all 1s;
-  display: none;
+  overflow: hidden;
+  transition: max-height .4s ease-in-out;
 }
 
 .asset-browser__assets--expanded {
+  max-height: 450px;
   display: flex;
-  transition: all 1s;
+  overflow: scroll;
+  transition: all 0.45s ease-out;
 }
 
 .asset-browser__asset {
