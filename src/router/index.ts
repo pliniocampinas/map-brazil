@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { activeSection0 } from '@/store/navLinks';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -42,6 +43,10 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.afterEach(() => {
+  activeSection0.value = ''
 })
 
 export default router
