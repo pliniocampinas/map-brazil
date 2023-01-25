@@ -26,7 +26,7 @@ export default defineComponent({
     },
   },
 
-  setup(props, { emit }) {
+  setup(props) {
     Chart.register(...registerables)
     const assetsCountChart = ref<Chart>()
     const squareMetersChart = ref<Chart>()
