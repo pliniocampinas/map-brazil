@@ -33,8 +33,12 @@ export const groupedNavLinks = [
     text: 'Fundos(FIIs)',
     inner: [
       {
-        text: 'Mapa FIIs',
+        text: 'Mapa FIIs Estados',
         to: '/maps/funds',
+      },
+      {
+        text: 'Mapa Densidade FIIs',
+        to: '/maps/funds-density',
       },
     ]
   },

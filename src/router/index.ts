@@ -35,8 +35,13 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/maps/funds',
-    name: 'BrazilRealStateFundsView',
+    name: 'BrazilRealStateFunds',
     component: () => import(/* webpackChunkName: "real-state-view" */ '../views/BrazilRealStateFundsView.vue')
+  },
+  {
+    path: '/maps/funds-density',
+    name: 'BrazilRealStateDensity',
+    component: () => import(/* webpackChunkName: "real-state-density-view" */ '../views/BrazilRealStateDensityView.vue')
   },
 ]
 
