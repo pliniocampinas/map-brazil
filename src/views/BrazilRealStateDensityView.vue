@@ -63,7 +63,7 @@ export default defineComponent({
 
       const bbox = (element as SVGPathElement).getBBox()
       const circleElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-      circleElement.setAttribute('r', '12')
+      circleElement.setAttribute('r', '6')
       circleElement.setAttribute('fill', 'var(--app-primary-color)')
       circleElement.setAttribute('fill-opacity', '0.4')
       circleElement.setAttribute('cx', bbox.x.toString())
