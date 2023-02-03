@@ -35,6 +35,7 @@ import { scaleQuantile } from 'd3';
 interface CircleAttibutes {
   radius: number
   opacity: number
+  cityReference: number
 }
 
 export default defineComponent({
@@ -77,12 +78,9 @@ export default defineComponent({
       circleElement.setAttribute('cx', bbox.x.toString())
       circleElement.setAttribute('cy', bbox.y.toString())
       gElement.appendChild(circleElement)
+      circleElement.addEventListener('click', () => cityClick(circleAttibutes.cityReference.toString()))
+      circleElement.addEventListener('touchend', () => cityClick(circleAttibutes.cityReference.toString()))
     }
-
-    // const calcRadius = (assetCount: number) => {
-    //   if(assetCount > )
-
-    // }
 
     const colorizeMap = () => {
       const gElement = document.querySelector('.brazil-real-state-density__map g')
@@ -108,7 +106,8 @@ export default defineComponent({
         }
         addCircle(gElement, pathElement, {
           radius: quantileCount(asset.assetsCount),
-          opacity: quantileSquares(asset.totalSquareMeters)
+          opacity: quantileSquares(asset.totalSquareMeters),
+          cityReference: asset.cityId
         })
       })
       Object.entries(pathElementsMap.value).forEach(keyValuePair => {
