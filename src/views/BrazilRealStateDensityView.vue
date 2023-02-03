@@ -71,12 +71,14 @@ export default defineComponent({
       }
 
       const bbox = (element as SVGPathElement).getBBox()
+      const xCoordinate = bbox.x + (bbox.width / 2)
+      const yCoordinate = bbox.y + (bbox.height / 2)
       const circleElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
       circleElement.setAttribute('r', circleAttibutes.radius.toString())
       circleElement.setAttribute('fill', 'var(--app-primary-color)')
       circleElement.setAttribute('fill-opacity', circleAttibutes.opacity.toString())
-      circleElement.setAttribute('cx', bbox.x.toString())
-      circleElement.setAttribute('cy', bbox.y.toString())
+      circleElement.setAttribute('cx', xCoordinate.toString())
+      circleElement.setAttribute('cy', yCoordinate.toString())
       gElement.appendChild(circleElement)
       circleElement.addEventListener('click', () => cityClick(circleAttibutes.cityReference.toString()))
       circleElement.addEventListener('touchend', () => cityClick(circleAttibutes.cityReference.toString()))
