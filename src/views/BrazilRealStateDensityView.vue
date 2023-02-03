@@ -25,13 +25,17 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { fetchData as fetchAssets } from '@/services/GetAssetsService';
+import { fetchData as fetchAssets } from '@/services/GetAssetsPerCityService';
 import { sleep } from '@/utils/timeHelper';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
-import Asset from '@/interfaces/Asset';
-import { Path } from 'd3-path';
+import AssetsPerCity from '@/interfaces/AssetsPerCity';
+import { scaleQuantile } from 'd3';
 
+interface CircleAttibutes {
+  radius: number
+  opacity: number
+}
 
 export default defineComponent({
   name: 'BrazilRealStateDensityView',
@@ -43,7 +47,7 @@ export default defineComponent({
 
   setup() {
     const isLoading = ref(false)
-    const assets = ref([] as Asset[])
+    const assets = ref([] as AssetsPerCity[])
     const pathElementsMap = ref<{ [code: string] : Element | null;}>({})
     const selectedCityCode = ref('')
 
@@ -56,22 +60,29 @@ export default defineComponent({
       isLoading.value = false
     }
 
-    const addCircle = (gElement: Element, element: Element | null) => {
+    const addCircle = (
+      gElement: Element, 
+      element: Element | null, 
+      circleAttibutes: CircleAttibutes
+    ) => {
       if(!element) {
         return
       }
 
       const bbox = (element as SVGPathElement).getBBox()
       const circleElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-      circleElement.setAttribute('r', '6')
+      circleElement.setAttribute('r', circleAttibutes.radius.toString())
       circleElement.setAttribute('fill', 'var(--app-primary-color)')
-      circleElement.setAttribute('fill-opacity', '0.4')
+      circleElement.setAttribute('fill-opacity', circleAttibutes.opacity.toString())
       circleElement.setAttribute('cx', bbox.x.toString())
       circleElement.setAttribute('cy', bbox.y.toString())
       gElement.appendChild(circleElement)
     }
 
-    const normalizeCityName = (name: string) => name.normalize('NFD').replace(/\p{Diacritic}/gu, "")
+    // const calcRadius = (assetCount: number) => {
+    //   if(assetCount > )
+
+    // }
 
     const colorizeMap = () => {
       const gElement = document.querySelector('.brazil-real-state-density__map g')
@@ -79,13 +90,29 @@ export default defineComponent({
         console.warn('SVG not rendered')
         return
       }
+
+      const radiusRange = [1, 2, 4, 8]
+      const quantileCount = scaleQuantile()
+        .domain(assets.value.map(a => a.assetsCount))
+        .range(radiusRange)
+
+      const opacityRange = [0.4, 0.5, 0.6]
+      const quantileSquares = scaleQuantile()
+        .domain(assets.value.map(a => a.totalSquareMeters))
+        .range(opacityRange)
+
+      assets.value.forEach(asset => {
+        const pathElement = pathElementsMap.value[asset.cityId.toString()]
+        if(!pathElement) {
+          return
+        }
+        addCircle(gElement, pathElement, {
+          radius: quantileCount(asset.assetsCount),
+          opacity: quantileSquares(asset.totalSquareMeters)
+        })
+      })
       Object.entries(pathElementsMap.value).forEach(keyValuePair => {
         const element  = keyValuePair[1]
-        const cityName = normalizeCityName(element?.getAttribute('description')?? '')
-        if(assets.value.find(asset => normalizeCityName(asset.city) === cityName)) {
-          addCircle(gElement, element)
-        }
-
         element?.setAttribute('fill', 'var(--app-secondary-color)')
       })
     }
