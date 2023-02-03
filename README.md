@@ -22,7 +22,8 @@
 - [x] Mapa estados com fundos imobiliários
 - [x] Listar fundos imobiliários e detalhes interativamente com o mapa
 - [x] Fazer mapa de densisdade dos ativos imobiliários com base nos municípios
-- [ ] Ajustar a visualização de densisdade dos ativos imobiliários com a quantidade por cidade, ajustando o tamanho do circulo de acordo
+- [x] Ajustar a visualização de densisdade dos ativos imobiliários com a quantidade por cidade, ajustando o tamanho do circulo de acordo
+- [ ] (Optional) Mover logica de renderização de circulos para componente
 - [ ] (Optional) Renderizar imagens como fallback para rodar app sem API e banco de dados. 
 - [ ] (Optional) Alternativamente usar arquivos .csv como fallback
 - [ ] Página capitais
