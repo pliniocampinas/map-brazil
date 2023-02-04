@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import { activeSection0 } from '@/store/navLinks';
+import { activeSection0, groupedNavLinks } from '@/store/navLinks';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -50,7 +50,14 @@ const router = createRouter({
   routes
 })
 
-router.afterEach(() => {
+router.afterEach((to) => {
+  for (const linkGroup of groupedNavLinks) {
+    if(linkGroup.inner?.find(innerLink => innerLink.to === to.path)) {
+      activeSection0.value = linkGroup.key
+      return
+    }
+  }
+
   activeSection0.value = ''
 })
 
