@@ -14,7 +14,12 @@
       </template>
 
       <template v-slot:browser-options>
-        
+        <FundSelector
+          :selectedFund="selectedFund"
+          :funds="funds"
+          @fund-selected="fundSelected"
+        >
+        </FundSelector>
       </template>
 
       <template v-slot:browser-details>
@@ -26,11 +31,14 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { fetchData as fetchAssets } from '@/services/GetAssetsPerCityService';
+import { fetchData as fetchFunds } from '@/services/GetFundsService';
 import { sleep } from '@/utils/timeHelper';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
+import FundSelector from '@/components/FundSelector.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
 import AssetsPerCity from '@/interfaces/AssetsPerCity';
 import { scaleQuantile } from 'd3';
+import Fund from '@/interfaces/Fund';
 
 interface CircleAttibutes {
   radius: number
@@ -43,19 +51,23 @@ export default defineComponent({
 
   components: {
     BrazilMunicipalitiesMap,
+    FundSelector,
     MapBrowser,
   },
 
   setup() {
     const isLoading = ref(false)
     const assets = ref([] as AssetsPerCity[])
+    const funds = ref([] as Fund[])
     const pathElementsMap = ref<{ [code: string] : Element | null;}>({})
+    const selectedFund = ref('')
     const selectedCityCode = ref('')
 
     const pathMapLoaded = async (pathMap: { [code: string] : Element | null; }) => {
       isLoading.value = true
       pathElementsMap.value = pathMap
       await sleep(400)
+      funds.value = await fetchFunds()
       assets.value = await fetchAssets()
       colorizeMap()
       isLoading.value = false
@@ -91,7 +103,9 @@ export default defineComponent({
         return
       }
 
-      const radiusRange = [1, 2, 4, 8]
+      document.querySelectorAll('.brazil-real-state-density__map circle').forEach(e => e.remove())
+
+      const radiusRange = [2, 3, 4, 6, 8]
       const quantileCount = scaleQuantile()
         .domain(assets.value.map(a => a.assetsCount))
         .range(radiusRange)
@@ -112,6 +126,7 @@ export default defineComponent({
           cityReference: asset.cityId
         })
       })
+      
       Object.entries(pathElementsMap.value).forEach(keyValuePair => {
         const element  = keyValuePair[1]
         element?.setAttribute('fill', 'var(--app-secondary-color)')
@@ -127,12 +142,24 @@ export default defineComponent({
       selectedCityCode.value = code;
     }
 
+    const fundSelected = async (fundAcronym: string) => {
+      selectedFund.value = fundAcronym
+      isLoading.value = true
+      await sleep(400)
+      assets.value = await fetchAssets(selectedFund.value)
+      colorizeMap()
+      isLoading.value = false
+    }
+
     return {
       assets,
+      funds,
       isLoading,
       selectedCityCode,
+      selectedFund,
       pathMapLoaded,
       cityClick,
+      fundSelected,
     }
   }
 });
