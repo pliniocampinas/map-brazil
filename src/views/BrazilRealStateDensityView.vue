@@ -96,15 +96,7 @@ export default defineComponent({
       circleElement.addEventListener('touchend', () => cityClick(circleAttibutes.cityReference.toString()))
     }
 
-    const colorizeMap = () => {
-      const gElement = document.querySelector('.brazil-real-state-density__map g')
-      if(!gElement) {
-        console.warn('SVG not rendered')
-        return
-      }
-
-      document.querySelectorAll('.brazil-real-state-density__map circle').forEach(e => e.remove())
-
+    const addCirclesForEachCity = (gElement: Element) => {
       const radiusRange = [2, 3, 4, 6, 8]
       const quantileCount = scaleQuantile()
         .domain(assets.value.map(a => a.assetsCount))
@@ -126,11 +118,29 @@ export default defineComponent({
           cityReference: asset.cityId
         })
       })
-      
+    }
+
+    const clearCircles = () => document.querySelectorAll('.brazil-real-state-density__map circle').forEach(e => e.remove())
+    
+    const colorizeCitiesWithDefaulColor = (defaultColor: string) => {
       Object.entries(pathElementsMap.value).forEach(keyValuePair => {
         const element  = keyValuePair[1]
-        element?.setAttribute('fill', 'var(--app-secondary-color)')
+        element?.setAttribute('fill', defaultColor)
       })
+    }
+
+    const colorizeMap = () => {
+      const gElement = document.querySelector('.brazil-real-state-density__map g')
+      if(!gElement) {
+        console.warn('SVG not rendered')
+        return
+      }
+
+      clearCircles()
+
+      addCirclesForEachCity(gElement)
+
+      colorizeCitiesWithDefaulColor('var(--app-secondary-color)')
     }
 
     const cityClick = (code: string) => {
