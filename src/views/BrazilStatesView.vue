@@ -44,7 +44,6 @@
 import { computed, defineComponent, ref } from 'vue';
 import { fetchData } from '@/repositories/StateRepository';
 import { formatCurrencyBrl } from '@/utils/formatters';
-import { sleep } from '@/utils/timeHelper';
 import BrazilStatesMap from '@/components/BrazilStatesMap.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
 import * as d3 from "d3";
@@ -113,7 +112,6 @@ export default defineComponent({
     
     const statesSvgLoaded = async () => {
       isLoading.value = true
-      await sleep(400)
       statesList.value = await fetchData()
       minValue.value = d3.min(statesList.value.map(state => state.gdpPerCapita)) || 0
       maxValue.value = d3.max(statesList.value.map(state => state.gdpPerCapita)) || 0

@@ -113,7 +113,6 @@ export default defineComponent({
     const statesSvgLoaded = async (pathMap: { [code: string] : Element | null; }) => {
       isLoading.value = true
       pathElementsMap.value = pathMap
-      await sleep(400)
       funds.value = await fetchFunds()
       assetsPerState.value = await fetchAssetsPerStateService()
       colorizeMap()
@@ -172,7 +171,6 @@ export default defineComponent({
     const fundSelected = async (fundAcronym: string) => {
       selectedFund.value = fundAcronym
       isLoading.value = true
-      await sleep(400)
       assetsPerState.value = await fetchAssetsPerStateService(selectedFund.value)
       colorizeMap()
       isLoading.value = false

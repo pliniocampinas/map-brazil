@@ -66,7 +66,6 @@ import LoadingBars from '@/components/LoadingBars.vue';
 import { fetchData } from '@/services/GetCityGeographicFeaturesService';
 import { fetchData as fetchStatsData } from '@/services/GetGeographicFeatureStatsService';
 import CityGeographicFeatures from '@/interfaces/CityGeographicFeatures';
-import { sleep } from '@/utils/timeHelper';
 import GeographicFeatureStats from '@/interfaces/GeographicFeatureStats';
 
 export default defineComponent({
@@ -118,7 +117,6 @@ export default defineComponent({
 
     const loadData = async () => {
       isLoading.value = true
-      await sleep(500)
       try {
         const data = await fetchData()
         municipalitiesList.value = data
@@ -205,7 +203,6 @@ export default defineComponent({
       });
       // Load
       isDetailsLoading.value = true
-      await sleep(500)
       selectedFeatureStats.value = await fetchStatsData(selectedFeature.value)
       isDetailsLoading.value = false
       await nextTick()

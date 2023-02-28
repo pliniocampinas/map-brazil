@@ -61,7 +61,6 @@ import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import LoadingBars from '@/components/LoadingBars.vue';
 import { fetchData } from '@/services/GetMetropolitanRegionsCities';
 import { fetchData as fetchDetails } from '@/services/GetMetropolitanRegionsDetailsService';
-import { sleep } from '@/utils/timeHelper';
 import MetropolitanRegionsCities from '@/interfaces/MetropolitanRegionsCities';
 import MetropolitanRegionsDetails from "@/interfaces/MetropolitanRegionsDetails";
 import { Chart, ChartItem, registerables } from "chart.js";
@@ -94,7 +93,6 @@ export default defineComponent({
     
     const loadData = async () => {
       isLoading.value = true
-      await sleep(500)
       try {
         const data = await fetchData()
         const uniqueMetropolitanRegionsSet = new Set<string>()
@@ -201,7 +199,6 @@ export default defineComponent({
     const loadDetails = async () => {
       // Load
       isDetailsLoading.value = true
-      await sleep(500)
       metropolitanRegionsDetails.value = await fetchDetails()
       isDetailsLoading.value = false
       await nextTick()

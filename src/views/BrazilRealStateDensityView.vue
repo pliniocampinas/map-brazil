@@ -32,7 +32,6 @@
 import { defineComponent, ref } from 'vue';
 import { fetchData as fetchAssets } from '@/services/GetAssetsPerCityService';
 import { fetchData as fetchFunds } from '@/services/GetFundsService';
-import { sleep } from '@/utils/timeHelper';
 import BrazilMunicipalitiesMap from '@/components/BrazilMunicipalitiesMap.vue';
 import FundSelector from '@/components/FundSelector.vue';
 import MapBrowser from '@/components/MapBrowser.vue';
@@ -66,7 +65,6 @@ export default defineComponent({
     const pathMapLoaded = async (pathMap: { [code: string] : Element | null; }) => {
       isLoading.value = true
       pathElementsMap.value = pathMap
-      await sleep(400)
       funds.value = await fetchFunds()
       assets.value = await fetchAssets()
       colorizeMap()
@@ -155,7 +153,6 @@ export default defineComponent({
     const fundSelected = async (fundAcronym: string) => {
       selectedFund.value = fundAcronym
       isLoading.value = true
-      await sleep(400)
       assets.value = await fetchAssets(selectedFund.value)
       colorizeMap()
       isLoading.value = false
