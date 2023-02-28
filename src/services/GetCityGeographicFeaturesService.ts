@@ -1,10 +1,8 @@
 import CityGeographicFeatures from "@/interfaces/CityGeographicFeatures"
-
-const baseUrl = process.env.VUE_APP_CITIES_API_URL ?? ''
+import { fetchJson } from "./HttpClient"
 
 export const fetchData = async () : Promise<CityGeographicFeatures[]> => {
-  const response = await fetch(`${baseUrl}/cities/geo-features`)
-    .then(response => response.json()) as CityGeographicFeatures[]
+  const response = await fetchJson('/cities/geo-features') as CityGeographicFeatures[]
 
   return response.map(city => {
     return {

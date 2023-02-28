@@ -1,10 +1,8 @@
 import MetropolitanRegionsCities from "@/interfaces/MetropolitanRegionsCities"
-
-const baseUrl = process.env.VUE_APP_CITIES_API_URL ?? ''
+import { fetchJson } from "./HttpClient"
 
 export const fetchData = async () : Promise<MetropolitanRegionsCities[]> => {
-  const response = await fetch(`${baseUrl}/cities/metropolitan-regions`)
-    .then(response => response.json()) as MetropolitanRegionsCities[]
+  const response = await fetchJson('/cities/metropolitan-regions') as MetropolitanRegionsCities[]
 
-    return response
+  return response
 }

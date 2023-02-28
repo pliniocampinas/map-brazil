@@ -1,10 +1,8 @@
 import Fund from "@/interfaces/Fund"
-
-const baseUrl = process.env.VUE_APP_CITIES_API_URL ?? ''
+import { fetchJson } from "./HttpClient"
 
 export const fetchData = async () : Promise<Fund[]> => {
-  const response = await fetch(`${baseUrl}/funds/list`)
-    .then(response => response.json()) as Fund[]
+  const response = await fetchJson('/funds/list') as Fund[]
 
   return response
 }

@@ -1,10 +1,8 @@
 import GeographicFeatureStats from "@/interfaces/GeographicFeatureStats"
-
-const baseUrl = process.env.VUE_APP_CITIES_API_URL ?? ''
+import { fetchJson } from "./HttpClient"
 
 export const fetchData = async (featureName: string) : Promise<GeographicFeatureStats> => {
-  const response = await fetch(`${baseUrl}/cities/features-stats/${featureName}`)
-    .then(response => response.json()) as GeographicFeatureStats
+  const response = await fetchJson(`/cities/features-stats/${featureName}`) as GeographicFeatureStats
 
   return response
 }

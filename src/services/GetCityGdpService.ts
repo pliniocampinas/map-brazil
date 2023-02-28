@@ -1,7 +1,6 @@
 import MunicipalitiesData from "@/interfaces/MunicipalitiesData"
 import CityGdp from "../interfaces/CityGdp"
-
-const baseUrl = process.env.VUE_APP_CITIES_API_URL ?? ''
+import { fetchJson } from "./HttpClient"
 
 const toMunicipality = (city: CityGdp) => {
   return {
@@ -15,8 +14,7 @@ const toMunicipality = (city: CityGdp) => {
 }
 
 export const fetchData = async (year = 0) : Promise<MunicipalitiesData[]> => {
-  const response = await fetch(`${baseUrl}/cities/gdp${year?'?year='+year:''}`)
-    .then(response => response.json()) as CityGdp[]
+  const response = await fetchJson(`/cities/gdp${year?'?year='+year:''}`) as CityGdp[]
 
   return response.map(toMunicipality)
 }

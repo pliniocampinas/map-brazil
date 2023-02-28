@@ -1,6 +1,5 @@
 import Asset from "@/interfaces/Asset"
-
-const baseUrl = process.env.VUE_APP_CITIES_API_URL ?? ''
+import { fetchJson } from "./HttpClient"
 
 interface AssetQuery {
   stateAcronym: string
@@ -8,7 +7,7 @@ interface AssetQuery {
 }
 
 export const fetchData = async (query?: AssetQuery) : Promise<Asset[]> => {
-  let url = `${baseUrl}/assets`
+  let url = '/assets'
   if(query) {
     url += '/?'
     const params = new URLSearchParams();
@@ -20,8 +19,7 @@ export const fetchData = async (query?: AssetQuery) : Promise<Asset[]> => {
     }
     url += params.toString()
   }
-  const response = await fetch(url)
-    .then(response => response.json()) as Asset[]
+  const response = await fetchJson(url) as Asset[]
 
   return response
 }
