@@ -32,7 +32,7 @@
     <AssetBrowser 
       :assets="assets"
       :isOpen="isAssetBrowserOepn"
-      @open="oepnAssetBrowser"
+      @open="openAssetBrowser"
     >
     </AssetBrowser>
     <AssetCharts
@@ -196,7 +196,7 @@ export default defineComponent({
       })
     }
 
-    const oepnAssetBrowser = () => {
+    const openAssetBrowser = () => {
       isAssetBrowserOepn.value = !isAssetBrowserOepn.value
     }
 
@@ -215,7 +215,7 @@ export default defineComponent({
       selectedStateDetails,
       statesSvgLoaded,
       stateClick,
-      oepnAssetBrowser,
+      openAssetBrowser,
     }
   }
 });
