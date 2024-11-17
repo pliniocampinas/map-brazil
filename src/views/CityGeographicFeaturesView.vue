@@ -324,9 +324,14 @@ export default defineComponent({
   height: 500px;
 }
 
+.geo-features-details__container {
+  color: var(--app-tertiary-color);
+}
+
 .geo-features-details__option {
-  border: 1px solid black;
+  border: 1px solid var(--app-secondary-color);
   padding: 4px;
+  color: var(--app-tertiary-color);
 }
 
 .geo-features-details__graph {

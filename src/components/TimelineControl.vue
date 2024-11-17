@@ -8,12 +8,18 @@
           {{ currentValue }}
         </strong>
       </div>
-      <button
-        class="time-line__play-button"
-        @click="handlePlay"
-        :class="isPlaying? 'pause': 'play'"
-        :disabled="isPlaying"
-      ></button>
+      <div class="time-line__play-block" @click="handlePlay">
+        <button
+          class="time-line__play-button"
+          :class="isPlaying? 'pause': 'play'"
+          :disabled="isPlaying"
+        ></button>
+        <div class="time-line__play-text">
+          <strong>
+            Play
+          </strong>
+        </div>
+      </div>
     </div>
     <div class="timeline-control__ticks">
       <div
@@ -95,6 +101,7 @@ export default defineComponent({
   align-items: center;
   gap: 10px;
   height: 28px;
+  padding: 4px;
 }
 
 .timeline-control__ticks {
@@ -104,8 +111,8 @@ export default defineComponent({
 
 .timeline-control__tick {
   cursor: pointer;
-  background-color: var(--app-primary-color);
-  border: 1px solid black;
+  background-color: var(--app-tertiary-color);
+  border: 1px solid var(--app-primary-color);
   box-sizing: border-box;
 }
 
@@ -113,11 +120,22 @@ export default defineComponent({
   background-color: var(--app-secondary-color);
 }
 
+.time-line__play-block {
+  display: flex;
+  cursor: pointer;
+}
+
+.time-line__play-text {
+  align-content: center;
+  text-decoration: underline;
+}
+
 .time-line__play-button {
   box-sizing: border-box;
   height: 20px;
   width: 20px;
-  border-color: transparent transparent transparent #202020;
+  border-color: transparent transparent transparent var(--app-tertiary-color);
+  background-color: transparent;
   cursor: pointer;
   /* play state */
   border-style: solid;

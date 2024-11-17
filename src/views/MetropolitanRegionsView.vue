@@ -318,6 +318,11 @@ export default defineComponent({
   margin: auto;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   position: relative;
+  color: var(--app-tertiary-color);
+}
+
+.metropolitan-regions__label__text {
+  color: var(--app-primary-color);
 }
 
 .metropolitan-regions__container {
@@ -372,8 +377,9 @@ export default defineComponent({
 }
 
 .metropolitan-regions-details__option {
-  border: 1px solid black;
+  border: 1px solid var(--app-secondary-color);
   padding: 4px;
+  color: var(--app-tertiary-color);
 }
 
 .metropolitan-regions-details__graph {

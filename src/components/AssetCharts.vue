@@ -136,5 +136,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
+.asset-charts {
+  color: var(--app-tertiary-color);
+}
 </style>

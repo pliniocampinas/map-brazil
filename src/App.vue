@@ -81,6 +81,11 @@ function handleClick(key: string) {
 :root {
   --app-primary-color: #2c3e50;
   --app-secondary-color: #42b983;
+  --app-tertiary-color: #eeeeee;
+}
+
+body {
+  background-color: var(--app-primary-color);
 }
 
 #app {
@@ -98,7 +103,8 @@ nav {
 nav a,
 .app__pseudo-link {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--app-tertiary-color);
+  text-decoration: underline;
 }
 
 nav a.router-link-exact-active,

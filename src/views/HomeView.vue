@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
-    <ul class="home-links">
+    <ul class="home-links__list">
       <template v-for="(link, index) in groupedNavLinks" :key="index+'-0'">
         <li class="home-links__item" v-if="index > 0">
           {{link.text}}
@@ -13,8 +13,8 @@
           custom
           v-slot="{ href, navigate }"
         >
-          <li class="home-links__inner-item">
-            <a class="home-links__inner-item-anchor" :href="href" @click="navigate" >
+          <li class="home-links__inner-item" @click="navigate">
+            <a class="home-links__inner-item-anchor" :href="href">
               {{ innerLink.text }}
             </a>
           </li>
@@ -39,28 +39,35 @@ export default defineComponent({
 </script>
 
 <style>
+.home-links__list {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .home-links__item,
 .home-links__inner-item {
-  border: 1px solid var(--app-secondary-color);
+  border: 2px solid var(--app-secondary-color);
   list-style-type: none; /* Remove bullets */
   margin: 0; /* Remove margins */
-  padding: 6px;
   font-weight: bold;
 }
 
 .home-links__item {
   padding: 12px;
   font-size: 20px;
-  background-color: var(--app-primary-color);
-  color: var(--app-secondary-color);
+  background-color: var(--app-tertiary-color);
+  color: var(--app-primary-color);
 }
 
 .home-links__inner-item {
+  padding: 12px;
   background-color: var(--app-primary-color);
-  color: #fff;
+  color: var(--app-tertiary-color);
 }
 
 .home-links__inner-item-anchor {
-  color: #fff;
+  color: var(--app-tertiary-color);
 }
 </style>

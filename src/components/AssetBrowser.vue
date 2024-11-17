@@ -86,6 +86,7 @@ export default defineComponent({
 
 .asset-browser__header__title {
   margin: 8px 0px;
+  color: var(--app-tertiary-color);
 }
 
 .asset-browser__assets {
@@ -107,7 +108,7 @@ export default defineComponent({
   padding: 4px 8px;
   border: 1px solid #ddd;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  background-color: rgba(200, 200, 200, 0.3);
+  background-color: var(--app-tertiary-color);
 }
 
 .asset-browser__asset-heading {

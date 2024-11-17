@@ -45,11 +45,15 @@ export default defineComponent({
   max-width: 750px;
   margin: auto;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border: 1px solid var(--app-secondary-color);
   position: relative;
+  color: var(--app-tertiary-color);
+  padding: 8px;
 }
 
 .map__browser__svg-container {
-  background-color: #f9f9f9;
+  padding: 4px;
+  background-color: var(--app-primary-color);
 }
 
 .map__browser__loading {
@@ -71,6 +75,11 @@ export default defineComponent({
   flex-wrap: wrap;
   column-gap: 12px;
   padding: 8px 12px;
+  border-bottom: 1px solid var(--app-secondary-color);
+}
+
+.map__browser__details {
+  border-top: 1px solid var(--app-secondary-color);
 }
 
 @media screen and (min-width: 768px) {

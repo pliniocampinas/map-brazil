@@ -46,6 +46,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 18px;
+  color: var(--app-primary-color);
 }
 
 .fund-view-switcher__option {
@@ -57,6 +58,7 @@ export default defineComponent({
   gap: 8px;
   background-color: #e0e0f0;
   cursor: pointer;
+  padding: 2px 4px;
 }
 
 .fund-view-switcher__box {
@@ -71,7 +73,7 @@ export default defineComponent({
 }
 
 .fund-view-switcher__option--selected .fund-view-switcher__box {
-  outline: 2px solid var(--app-primary-color);
+  outline: 2px solid var(--app-tertiary-color);
   background-color: var(--app-secondary-color);
 }
 </style>
