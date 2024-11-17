@@ -175,6 +175,7 @@ export default defineComponent({
 <style scoped>
 .brazil-real-state-density__map-container {
   position: relative;
+  background-color: var(--app-tertiary-color);
 }
 
 .brazil-real-state-density__map {
